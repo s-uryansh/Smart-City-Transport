@@ -1,0 +1,40 @@
+package db
+
+import (
+	"SmartCityTransportSystem/config"
+	"database/sql"
+	"fmt"
+	"log"
+
+	_ "github.com/go-sql-driver/mysql"
+)
+
+var DB *sql.DB
+
+func Connect() error {
+	cfg := config.AppConfig
+
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true",
+		cfg.DBUser, cfg.DBPassword, cfg.DBHost, cfg.DBPort, cfg.DBName)
+
+	var err error
+	DB, err = sql.Open("mysql", dsn)
+	if err != nil {
+		return fmt.Errorf("error opening DB(pkg/db/db.go): %v", err)
+	}
+
+	err = DB.Ping()
+	if err != nil {
+		return fmt.Errorf("error pinging DB(pkg/db/db.go): %v", err)
+	}
+
+	log.Println("Connected to MySQL database")
+	return nil
+}
+
+func Close() {
+	if DB != nil {
+		DB.Close()
+		log.Println("MySQL database connection closed")
+	}
+}

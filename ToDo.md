@@ -1,0 +1,2 @@
+- [ ] User (admin and manager for each table role , log out)
+- [ ] Trigger Query add
