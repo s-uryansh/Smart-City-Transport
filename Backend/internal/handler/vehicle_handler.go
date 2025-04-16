@@ -5,6 +5,7 @@ import (
 	"SmartCityTransportSystem/internal/repository"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -85,7 +86,29 @@ func UpdateVehicle(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "Vehicle updated"})
 }
-
+func UpdateVehicleByID(c *gin.Context) {
+	vid, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid vehicle ID"})
+		log.Println("Error(handler/vehicle): ", err)
+		return
+	}
+	var v models.Vehicle
+	v.VehicleID = vid
+	if err := c.ShouldBindJSON(&v); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
+		log.Println("Error(handler/vehicle): ", err)
+		return
+	}
+	log.Println("Vehicle Updating")
+	err = repository.UpdateVehicle(vid, v)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not update vehicle"})
+		log.Println("Error(handler/vehicle): ", err)
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "Vehicle updated"})
+}
 func DeleteVehicle(c *gin.Context) {
 	uid := c.GetInt("user_id")
 	var h models.Human
@@ -97,6 +120,21 @@ func DeleteVehicle(c *gin.Context) {
 	}
 	id := h.VID
 	err = repository.DeleteVehicle(id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not delete vehicle"})
+		log.Println("Error(handler/vehicle): ", err)
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "Vehicle deleted"})
+}
+func DeleteVehicleByID(c *gin.Context) {
+	vid, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid vehicle ID"})
+		log.Println("Error(handler/vehicle): ", err)
+		return
+	}
+	err = repository.DeleteVehicle(vid)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not delete vehicle"})
 		log.Println("Error(handler/vehicle): ", err)

@@ -37,6 +37,32 @@ func GetAccidentHistoryByID(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, data)
 }
+func UpdateAccidentHistory(c *gin.Context) {
+	var oldVID, oldIID int
+	var newEntry models.AccidentHistory
+
+	// Get old composite key from query params
+	oldVID, err1 := strconv.Atoi(c.Query("old_vid"))
+	oldIID, err2 := strconv.Atoi(c.Query("old_iid"))
+	if err1 != nil || err2 != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid query parameters"})
+		return
+	}
+
+	if err := c.ShouldBindJSON(&newEntry); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
+		return
+	}
+
+	err := repository.UpdateAccidentHistory(oldVID, oldIID, newEntry.VID, newEntry.IID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update accident history"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Accident history updated"})
+}
+
 func CreateAccidentHistory(c *gin.Context) {
 	var ah models.AccidentHistory
 	if err := c.ShouldBindJSON(&ah); err != nil {

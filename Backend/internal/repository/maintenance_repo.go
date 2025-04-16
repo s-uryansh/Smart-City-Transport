@@ -39,7 +39,22 @@ func GetMaintenanceByID(id int) ([]models.Maintenance, error) {
 	}
 	return list, err
 }
-
+func GetMaintenanceByMID(id int) ([]models.Maintenance, error) {
+	rows, err := db.DB.Query("SELECT MAINTENANCE_ID, V_ID, ISSUE_REPORTED, REPAIR_STATUS FROM maintenance WHERE MAINTENANCE_ID = ?", id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var list []models.Maintenance
+	for rows.Next() {
+		var m models.Maintenance
+		if err := rows.Scan(&m.MaintenanceID, &m.VID, &m.IssueReported, &m.RepairStatus); err != nil {
+			return nil, err
+		}
+		list = append(list, m)
+	}
+	return list, err
+}
 func CreateMaintenance(m models.Maintenance) error {
 	_, err := db.DB.Exec(
 		"INSERT INTO maintenance (MAINTENANCE_ID, V_ID, ISSUE_REPORTED, REPAIR_STATUS) VALUES (?, ?, ?, ?)",

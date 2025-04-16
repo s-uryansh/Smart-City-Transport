@@ -63,7 +63,6 @@ func GetRoutesByVehicleID(vehicleID int) ([]int, error) {
 
 // Insert a new route_followed entry
 func CreateRouteFollowed(rf models.RouteFollowed) error {
-	log.Println(rf.VehicleID)
 	_, err := db.DB.Exec("INSERT INTO route_followed (VEHICLE_ID, RT_ID) VALUES (?, ?)", rf.VehicleID, rf.RouteID)
 	return err
 }
@@ -71,5 +70,6 @@ func CreateRouteFollowed(rf models.RouteFollowed) error {
 // Delete a route_followed entry by vehicle ID and route ID
 func DeleteRouteFollowed(vehicleID, routeID int) error {
 	_, err := db.DB.Exec("DELETE FROM route_followed WHERE VEHICLE_ID = ? AND RT_ID = ?", vehicleID, routeID)
+	log.Println("Route Followed Deleted")
 	return err
 }

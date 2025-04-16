@@ -52,3 +52,7 @@ func CreateScheduleFollowed(sf models.ScheduleFollowed) error {
 		sf.RID, sf.SID)
 	return err
 }
+func DeleteScheduleFollowed(id int) error {
+	_, err := db.DB.Exec("DELETE FROM schedule_followed WHERE S_ID = ?", id)
+	return err
+}

@@ -20,7 +20,7 @@ func GetAllMaintenance(c *gin.Context) {
 	c.JSON(http.StatusOK, data)
 }
 
-func GetMaintenanceByID(c *gin.Context) {
+func GetMaintenance(c *gin.Context) {
 	uid := c.GetInt("user_id")
 	var h models.Human
 	h, err := repository.GetHumanByID(uid)
@@ -38,7 +38,21 @@ func GetMaintenanceByID(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, data)
 }
-
+func GetMaintenanceByMID(c *gin.Context) {
+	m_id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid maintenance ID"})
+		log.Println("Error(handler/maintenance): ", err)
+		return
+	}
+	data, err := repository.GetMaintenanceByID(m_id)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Maintenance record not found"})
+		log.Println("Error(handler/maintenance): ", err)
+		return
+	}
+	c.JSON(http.StatusOK, data)
+}
 func CreateMaintenance(c *gin.Context) {
 	var m models.Maintenance
 	if err := c.ShouldBindJSON(&m); err != nil {

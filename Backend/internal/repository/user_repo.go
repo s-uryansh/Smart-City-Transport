@@ -42,9 +42,9 @@ func GetUserByID(id int) (*models.User, error) {
 }
 
 func GetUserByUsername(username string) (*models.User, error) {
-	row := db.DB.QueryRow("SELECT ID_NO, username, password FROM users WHERE username = ?", username)
+	row := db.DB.QueryRow("SELECT ID_NO, username, password , roles FROM users WHERE username = ?", username)
 	var user models.User
-	err := row.Scan(&user.IDNo, &user.Username, &user.Password)
+	err := row.Scan(&user.IDNo, &user.Username, &user.Password, &user.Role)
 	if err != nil {
 		return nil, err
 	}

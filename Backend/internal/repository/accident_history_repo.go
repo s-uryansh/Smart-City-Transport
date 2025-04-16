@@ -39,6 +39,11 @@ func GetAccidentHistoryByID(id int) ([]models.AccidentHistory, error) {
 	}
 	return accidents, nil
 }
+func UpdateAccidentHistoryByID(ah models.AccidentHistory) error {
+	_, err := db.DB.Exec("UPDATE schedule_followed SET V_ID = ? , I_ID = ? WHERE V_ID = ?",
+		ah.VID, ah.IID, ah.VID)
+	return err
+}
 func CreateAccidentHistory(ah models.AccidentHistory) error {
 	_, err := db.DB.Exec("INSERT INTO accident_history (V_ID, I_ID) VALUES (?, ?)", ah.VID, ah.IID)
 	return err

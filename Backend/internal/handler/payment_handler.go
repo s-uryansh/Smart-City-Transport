@@ -63,7 +63,27 @@ func CreatePayment(c *gin.Context) {
 	}
 	c.JSON(http.StatusCreated, gin.H{"message": "Payment created"})
 }
-
+func CreatePaymentByID(c *gin.Context) {
+	var p models.Payment
+	var err error
+	p.PassengerID, err = strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid payment ID"})
+		log.Println("Error(handler/payments): ", err)
+		return
+	}
+	if err := c.ShouldBindJSON(&p); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
+		log.Println("Error(handler/payments): ", err)
+		return
+	}
+	if err := repository.CreatePayment(p); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create payment"})
+		log.Println("Error(handler/payments): ", err)
+		return
+	}
+	c.JSON(http.StatusCreated, gin.H{"message": "Payment created"})
+}
 func UpdatePayment(c *gin.Context) {
 	userID := c.GetInt("user_id")
 	log.Println("User ID: ", userID)

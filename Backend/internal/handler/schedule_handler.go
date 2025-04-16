@@ -19,6 +19,7 @@ func GetAllSchedules(c *gin.Context) {
 		log.Println("Error(handler/schedule): ", err)
 		return
 	}
+
 	c.JSON(http.StatusOK, schedules)
 }
 

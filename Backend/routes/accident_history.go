@@ -14,6 +14,7 @@ func RegisterAccidentHistoryRoutes(rg *gin.Engine) {
 
 		ah.GET("/all", handler.GetAllAccidentHistory)
 		ah.GET("/", handler.GetAccidentHistoryByID)
+		ah.PUT("/:vid/:iid", handler.UpdateAccidentHistory)
 		ah.POST("/", handler.CreateAccidentHistory)
 		ah.DELETE("/:vid/:iid", handler.DeleteAccidentHistory)
 	}

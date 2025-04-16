@@ -12,7 +12,8 @@ func RegisterMaintenanceRoutes(rg *gin.Engine) {
 	{
 		m.Use(middleware.JWTAuthMiddleware())
 		m.GET("/all", handler.GetAllMaintenance)
-		m.GET("/", handler.GetMaintenanceByID)
+		m.GET("/:id", handler.GetMaintenanceByMID)
+		m.GET("/", handler.GetMaintenance)
 		m.POST("/", handler.CreateMaintenance)
 		m.PUT("/:id", handler.UpdateMaintenance)
 		m.DELETE("/:id", handler.DeleteMaintenance)

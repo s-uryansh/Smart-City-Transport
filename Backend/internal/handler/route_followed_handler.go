@@ -64,6 +64,29 @@ func CreateRouteFollowed(c *gin.Context) {
 	}
 	c.JSON(http.StatusCreated, gin.H{"message": "Route-followed entry created"})
 }
+func CreateRouteFollowedAdmin(c *gin.Context) {
+	routeID, err := strconv.Atoi(c.Param("route_id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid route ID"})
+		log.Println("Error(handler/route_followed): ", err)
+		return
+	}
+	vid, err := strconv.Atoi(c.Param("vid"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid route ID"})
+		log.Println("Error(handler/route_followed): ", err)
+		return
+	}
+	var rf models.RouteFollowed
+	rf.RouteID = routeID
+	rf.VehicleID = vid
+	if err := repository.CreateRouteFollowed(rf); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create entry"})
+		log.Println("Error(handler/route_followed): ", err)
+		return
+	}
+	c.JSON(http.StatusCreated, gin.H{"message": "Route-followed entry created"})
+}
 
 // Delete a route_followed entry
 func DeleteRouteFollowed(c *gin.Context) {
@@ -77,6 +100,26 @@ func DeleteRouteFollowed(c *gin.Context) {
 	}
 	vid := h.VID
 	routeID, err := strconv.Atoi(c.Param("route_id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid route ID"})
+		log.Println("Error(handler/route_followed): ", err)
+		return
+	}
+	if err := repository.DeleteRouteFollowed(vid, routeID); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete entry"})
+		log.Println("Error(handler/route_followed): ", err)
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "Entry deleted successfully"})
+}
+func DeleteRouteFollowedAdmin(c *gin.Context) {
+	routeID, err := strconv.Atoi(c.Param("route_id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid route ID"})
+		log.Println("Error(handler/route_followed): ", err)
+		return
+	}
+	vid, err := strconv.Atoi(c.Param("vid"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid route ID"})
 		log.Println("Error(handler/route_followed): ", err)

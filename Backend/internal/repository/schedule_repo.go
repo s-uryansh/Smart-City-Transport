@@ -19,11 +19,25 @@ func GetAllSchedules() ([]models.Schedule, error) {
 	var schedules []models.Schedule
 	for rows.Next() {
 		var s models.Schedule
-		if err := rows.Scan(&s.ScheduleID, &s.RID, &s.VID, &s.DepartureTime, &s.ArrivalTime); err != nil {
+		var departureStr, arrivalStr string
+
+		if err := rows.Scan(&s.ScheduleID, &s.RID, &s.VID, &departureStr, &arrivalStr); err != nil {
 			return nil, err
 		}
+
+		// Parse time using the "15:04:05" layout for TIME fields
+		s.DepartureTime, err = time.Parse("15:04:05", departureStr)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse DEPARTURE_TIME: %w", err)
+		}
+		s.ArrivalTime, err = time.Parse("15:04:05", arrivalStr)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse ARRIVAL_TIME: %w", err)
+		}
+
 		schedules = append(schedules, s)
 	}
+
 	return schedules, nil
 }
 

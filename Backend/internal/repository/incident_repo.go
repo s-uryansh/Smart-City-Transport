@@ -40,6 +40,30 @@ func GetIncidentByID(id int) ([]models.Incident, error) {
 	}
 	return incidents, nil
 }
+func GetIncidentByIID(id int) ([]models.Incident, error) {
+	rows, err := db.DB.Query("SELECT INCIDENT_ID, V_ID, DESCRIPTION, REPORT_TIME_DATE FROM incident WHERE INCIDENT_ID = ?", id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var incidents []models.Incident
+	for rows.Next() {
+		var i models.Incident
+		if err := rows.Scan(&i.IncidentID, &i.VID, &i.Description, &i.ReportTimeDate); err != nil {
+			return nil, err
+		}
+		incidents = append(incidents, i)
+	}
+	return incidents, nil
+}
+func UpdateAccidentHistory(oldVID, oldIID, newVID, newIID int) error {
+	_, err := db.DB.Exec(
+		"UPDATE accident_history SET V_ID = ?, I_ID = ? WHERE V_ID = ? AND I_ID = ?",
+		newVID, newIID, oldVID, oldIID,
+	)
+	return err
+}
 
 func CreateIncident(vid int, i models.Incident) error {
 	_, err := db.DB.Exec(

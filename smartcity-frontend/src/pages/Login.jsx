@@ -35,10 +35,19 @@ function Login() {
       });
 
       const data = await res.json();
-
       if (res.ok) {
         localStorage.setItem('token', data.token);
-        navigate('/dashboard');
+        //============================================//
+        //check users role and show them there page
+
+        if(data.Role == "Admin"){
+          navigate('/admin-dashboard');
+        }
+        if(data.Role == "user"){
+          navigate('/dashboard');
+        }
+
+        //============================================//
       } else {
         alert('Login failed: ' + (data?.message || data?.error || 'Unknown error'));
       }

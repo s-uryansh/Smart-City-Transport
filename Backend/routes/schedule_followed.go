@@ -12,7 +12,10 @@ func RegisterScheduleFollowedRoutes(rg *gin.Engine) {
 	{
 		sf.Use(middleware.JWTAuthMiddleware())
 		sf.GET("/all", handler.GetAllScheduleFollowed)
+		sf.PUT("/:id", handler.UpdateScheduleFollowedByID)
+		sf.DELETE("/:id", handler.DeleteScheduleFollowed)
 		sf.GET("/", handler.GetScheduleFollowedByID)
 		sf.POST("/", handler.CreateScheduleFollowed)
+		sf.POST("/:R_ID/:S_ID", handler.CreateScheduleFollowedAdmin)
 	}
 }
