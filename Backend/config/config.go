@@ -19,11 +19,10 @@ type Config struct {
 var AppConfig *Config
 
 func LoadConfig() error {
-	err := godotenv.Load()
-	if err != nil {
-		log.Println("No env file, Error: ", err)
-		return err
+	if err := godotenv.Load(); err != nil {
+		log.Println("No .env file found, continuing with system environment variables")
 	}
+
 	AppConfig = &Config{
 		DBUser:     getEnv("DB_USER", "root"),
 		DBPassword: getEnv("DB_PASSWORD", ""),
