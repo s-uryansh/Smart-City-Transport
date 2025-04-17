@@ -1,33 +1,27 @@
-FROM ubuntu:22.04 AS builder
+# --------- Build Stage ---------
+    FROM golang:1.22 AS builder
 
-# Install dependencies: CA certs, wget, and unzip tools
-RUN apt-get update && apt-get install -y wget ca-certificates tzdata
-
-# Set timezone to UTC to avoid SSL validation issues (optional)
-ENV TZ=UTC
-
-# Install Go manually
-ENV GO_VERSION=1.22.2
-RUN wget https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz && \
-    tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz && \
-    ln -s /usr/local/go/bin/go /usr/bin/go
-
-ENV PATH="/usr/local/go/bin:${PATH}"
-
-WORKDIR /app
-
-COPY go.mod go.sum ./
-RUN go mod download
-
-COPY . .
-
-RUN go build -o server ./cmd/app
-
-# Runtime image
-FROM ubuntu:22.04
-
-RUN apt-get update && apt-get install -y ca-certificates
-
-COPY --from=builder /app/server .
-
-CMD ["./server"]
+    # Create the app directory inside the container
+    WORKDIR /app
+    
+    # Copy Go module files and download dependencies
+    COPY go.mod go.sum ./
+    RUN go mod download
+    
+    # Copy the source code into the container
+    COPY . .
+    
+    # Build the Go app from cmd/app
+    RUN go build -o server ./cmd/app
+    
+    # --------- Run Stage ---------
+    FROM debian:bullseye-slim
+    
+    # Copy the binary from the builder stage
+    COPY --from=builder /app/server .
+    
+    # Cloud Run listens on port 8080 by default
+    EXPOSE 8080
+    
+    # Set the default command to run your server
+    CMD ["./server"]
