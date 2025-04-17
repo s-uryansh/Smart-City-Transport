@@ -1,4 +1,4 @@
-- [ ] User (admin and manager for each table role , log out)
+- [x] User (admin and manager for each table role , log out)
 - [ ] Trigger Query add
 
 # Admin Page
@@ -22,4 +22,4 @@
 - [x] Add Incident Manager
 - [x] Add Schedule Manager
 - [x] Add Route Manager
-- [x] Accident Manager
+- [x] Add Accident Manager
