@@ -46,6 +46,27 @@ function Login() {
         if(data.Role == "user"){
           navigate('/dashboard');
         }
+        if(data.Role == "Vehicle Manager"){
+          navigate('/vehicle-dashboard');
+        }
+        if(data.Role == "Maintenance Manager"){
+          navigate('/maintenance-dashboard');
+        }
+        if(data.Role == "Payment Manager"){
+          navigate('/payment-dashboard');
+        }
+        if(data.Role == "Schedule Manager"){
+          navigate('/schedule-dashboard');
+        }
+        if(data.Role == "Route Manager"){
+          navigate('/route-dashboard');
+        }
+        if(data.Role == "Incident Manager"){
+          navigate('/incident-dashboard');
+        }
+        if(data.Role == "Accident Manager"){
+          navigate('/accident-dashboard');
+        }
 
         //============================================//
       } else {

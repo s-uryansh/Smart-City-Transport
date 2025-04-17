@@ -22,15 +22,9 @@ func GetAllPayments(c *gin.Context) {
 
 func GetPaymentByID(c *gin.Context) {
 	uid := c.GetInt("user_id")
-	var h models.Human
-	h, err := repository.GetHumanByID(uid)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch operates_on"})
-		log.Println("Error(handler/operates_on): ", err)
-		return
-	}
-	hid := h.IDNo
-	payment, err := repository.GetPaymentByID(hid)
+	log.Println(uid)
+	payment, err := repository.GetPaymentByID(uid)
+	log.Println(payment)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Payment not found"})
 		log.Println("Error(handler/payments): ", err)

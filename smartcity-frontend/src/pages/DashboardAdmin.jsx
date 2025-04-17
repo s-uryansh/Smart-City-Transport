@@ -109,7 +109,24 @@ function Dashboard() {
   const [newDepartureTime, setNewDepartureTime] = useState('');
   const [newArrivalTime, setNewArrivalTime] = useState('');
   const [newScheduleSId, setNewScheduleSId] = useState('');
+//==========================Logout===============================
+const logout = async () => {
+  try {
+    const token = localStorage.getItem('token');
+    await fetch('http://localhost:8080/auth/logout', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+  } catch (error) {
+    console.error('Logout failed:', error);
+  }
 
+  localStorage.removeItem('token');
+  showSnackbar('Logged out successfully!', 'info');
+  window.location.href = '/human-create'; // or use navigate('/login') with React Router
+};
 //===========================Helpers===========================
 const formatTime = (time) => {
     return time.length === 5 ? `${time}:00` : time;
@@ -260,7 +277,6 @@ const createScheduleFollowed = async () => {
     showSnackbar("Error creating schedule followed", "error");
   }
 };
-
 const deleteScheduleFollowed = async (s_id) => {
   try {
     const token = localStorage.getItem("token");
@@ -345,7 +361,6 @@ const fetchRouteFollowed = async () => {
     showSnackbar("Error fetching route followed data", "error");
   }
 };
-
 //===========================Func Route===========================
 const createRoute = async () => {
   try {
@@ -2526,6 +2541,7 @@ return (
     </div>
   </div>
 )}
+
 {selectedMaintenance && (
   <div className="mt-3">
     <h6>Edit Maintenance Record</h6>
@@ -2976,7 +2992,11 @@ return (
     {snackbar.message}
   </div>
 )}
-
+<div className="position-absolute bottom-0 end-1 p-2">
+  <button className="btn btn-outline-danger" onClick={logout}>
+    Logout
+  </button>
+</div>
 {/* Error Modal */}
 {showErrorModal && (
         <div className="modal d-block" tabIndex="-1" role="dialog" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>

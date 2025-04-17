@@ -2,1059 +2,124 @@ import React, { useState,useEffect } from 'react';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Dropdown } from 'react-bootstrap';
 import axios from 'axios';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
 function Dashboard() {
+//===========================Profile===========================
   const [showModal, setShowModal] = useState(false);
   const [profileData, setProfileData] = useState(null);
   const [formData, setFormData] = useState({ FName: '', LName: '', DOB: '', Age: '', V_ID: '' });
+  const getProfile = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch('http://localhost:8080/humans/', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!res.ok) throw new Error(`Failed to fetch: ${res.status}`);
+
+      const data = await res.json();
+      setProfileData(data);
+      setFormData({
+        FName: data.fname || '',
+        LName: data.lname || '',
+        DOB: data.dob ? data.dob.split('T')[0] : '',
+        Age: data.age || '',
+        V_ID: data.v_id || ''
+      });
+    } catch (err) {
+      console.error(err);
+      showSnackbar("Error fetching profile", 'error');
+    }
+  };
+  const updateProfile = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch('http://localhost:8080/humans/', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          ...formData,
+          Age: parseInt(formData.Age),
+          V_ID: parseInt(formData.V_ID),
+        }),
+      });
+
+      if (res.ok) {
+        showSnackbar("Profile updated successfully!");
+        getProfile();
+      } else {
+        const text = await res.text();
+        if (text.includes("foreign key constraint fails")) {
+          setErrorMessage("Can't delete: MySQL foreign key rule.");
+          setShowErrorModal(true);
+        } else {
+          showSnackbar("Error updating profile", 'error');
+        }
+      }
+    } catch (err) {
+      console.error(err);
+      showSnackbar("server error", 'error');
+    }
+  };
+  const deleteProfile = async () => {
+    const confirmDelete = window.confirm('Are you sure you want to delete your profile?');
+    if (!confirmDelete) return;
+
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch('http://localhost:8080/humans/', {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (res.ok) {
+        showSnackbar("profile deleted successfully");
+        setProfileData(null);
+        setShowModal(false);
+      } else {
+        const text = await res.text();
+          setErrorMessage("Can't delete: MySQL foreign key rule bro.");
+          setShowErrorModal(true);
+        //   alert('Failed to delete profile');
+        
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Server error');
+    }
+  };
+//===========================Errors===========================
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+//===========================Dark Mode===========================
   const [isDarkMode, setIsDarkMode] = useState(true);
-  const [newVehicleId, setNewVehicleId] = useState('');
   useEffect(() => {
     const savedTheme = localStorage.getItem('darkMode');
     if (savedTheme) setIsDarkMode(savedTheme === 'true');
   }, []);
-  
   useEffect(() => {
     document.body.className = isDarkMode ? 'dark-mode' : 'light-mode';
     localStorage.setItem('darkMode', isDarkMode);
   }, [isDarkMode]);
-  
+//===========================Vehicle===========================
+  const [newVehicleId, setNewVehicleId] = useState('');  
   const [showVehiclesModal, setShowVehiclesModal] = useState(false);
   const [vehiclesData, setVehiclesData] = useState([]);
   const [showVehicleUpdateModal, setShowVehicleUpdateModal] = useState(false);
+  const [scheduleVehicleId, setScheduleVehicleId] = useState(null);
   const [selectedVehicleId, setSelectedVehicleId] = useState(null);
   const [updateFormData, setUpdateFormData] = useState({
     current_location: '',
     status: '',
   });
-  const [incidentData, setIncidentData] = useState(null);
-  const [showIncidentModal, setShowIncidentModal] = useState(false);
-  const [editingIncidentId, setEditingIncidentId] = useState(null);
-  const [editedDescription, setEditedDescription] = useState('');  
-  const [newIncidentId, setNewIncidentId] = useState('');
-  const [newDescription, setNewDescription] = useState('');
-  const [showCreateForm, setShowCreateForm] = useState(false);
-  const [openSnackbar, setOpenSnackbar] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [snackbarSeverity, setSnackbarSeverity] = useState('success');
-  const [newMaintenanceId, setNewMaintenanceId] = useState('');
-  const [maintenanceHistoryData, setMaintenanceHistoryData] = useState([]);
-  const [showMaintenanceHistoryModal, setShowMaintenanceHistoryModal] = useState(false);
-  const [newIssueReported, setNewIssueReported] = useState('');
-  const [newRepairStatus, setNewRepairStatus] = useState('Pending');
-  const [showCreateMaintenanceForm, setShowCreateMaintenanceForm] = useState(false);
-  const [accidentHistoryData, setAccidentHistoryData] = useState([]);
-  const [showAccidentHistoryModal, setShowAccidentHistoryModal] = useState(false);
-  const [maintenanceData, setMaintenanceData] = useState([]); // State for maintenance data
-  const [showMaintenanceModal, setShowMaintenanceModal] = useState(false); // State to control maintenance modal visibility
-  const [editingMaintenanceId, setEditingMaintenanceId] = useState(null);
-  const [editVehicleId, setEditVehicleId] = useState('');
-  const [editIssueReported, setEditIssueReported] = useState('');
-  const [editRepairStatus, setEditRepairStatus] = useState('Pending');
-  const [operatesOnData, setOperatesOnData] = useState([]);
-  const [showOperatesOnModal, setShowOperatesOnModal] = useState(false);
-  const [newOperatesOnVehicleId, setNewOperatesOnVehicleId] = useState('');
-  const [newOperatesOnStationId, setNewOperatesOnStationId] = useState('');
-  const [paymentsData, setPaymentsData] = useState([]);
-  const [showPaymentsModal, setShowPaymentsModal] = useState(false);
-  const [newPaymentId, setNewPaymentId] = useState('');
-  const [newAmount, setNewAmount] = useState('');
-  const [newMethod, setNewMethod] = useState('');
-  const [performsMaintenanceData, setPerformsMaintenanceData] = useState([]);
-  const [showPerformsMaintenanceModal, setShowPerformsMaintenanceModal] = useState(false);
-  const [newStaffId, setNewStaffId] = useState('');
-  const [showRouteModal, setShowRouteModal] = useState(false);
-const [routeOperation, setRouteOperation] = useState('');
-const [routeId, setRouteId] = useState('');
-const [journeyTime, setJourneyTime] = useState('');
-const [newRouteFollowedId, setNewRouteFollowedId] = useState('');
-
-const [startPoint, setStartPoint] = useState('');
-const [endPoint, setEndPoint] = useState('');
-const [distance, setDistance] = useState('');
-const [routeData, setRouteData] = useState(null); // State to hold fetched route data
-const [routeFollowedData, setRouteFollowedData] = useState([]);
-const [showRouteFollowedModal, setShowRouteFollowedModal] = useState(false);
-const [scheduleFollowedData, setScheduleFollowedData] = useState([]);
-const [scheduleVehicleId, setScheduleVehicleId] = useState(null);
-const [showScheduleFollowedModal, setShowScheduleFollowedModal] = useState(false);
-const [newScheduleRId, setNewScheduleRId] = useState('');
-const [scheduleData, setScheduleData] = useState([]);
-const [showScheduleModal, setShowScheduleModal] = useState(false);
-// const [newScheduleId, setNewScheduleId] = useState('');
-const [newScheduleId, setNewScheduleId] = useState('');
-// const [newScheduleRId, setNewScheduleRId] = useState('');
-const [newScheduleVId, setNewScheduleVId] = useState('');
-const [newDepartureTime, setNewDepartureTime] = useState('');
-const [newArrivalTime, setNewArrivalTime] = useState('');
-
-const [newScheduleSId, setNewScheduleSId] = useState('');
-const fetchSchedule = async () => {
-  try {
-    const token = localStorage.getItem("token");
-    const res = await fetch("http://localhost:8080/schedule/", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    
-    if (!res.ok) throw new Error("Failed to fetch schedule");
-    
-    const data = await res.json();
-    console.log(data)
-    const normalized = Array.isArray(data) ? data : [data];
-    setScheduleData(normalized);
-    setShowScheduleModal(true);
-    showSnackbar("Schedule data fetched!");
-  } catch (err) {
-    console.error(err);
-    showSnackbar("Error fetching schedule", "error");
-  }
-};
-
-const deleteSchedule = async (scheduleId) => {
-  try {
-    const token = localStorage.getItem("token");
-    const res = await fetch(`http://localhost:8080/schedule/${scheduleId}`, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    if (!res.ok) throw new Error("Failed to delete schedule");
-
-    showSnackbar("Schedule deleted successfully!");
-    fetchSchedule();
-  } catch (err) {
-    console.error(err);
-    showSnackbar("Error deleting schedule", "error");
-  }
-};
-
-const formatTime = (time) => {
-  return time.length === 5 ? `${time}:00` : time;
-};
-const resetForm = () => {
-  setNewScheduleId('');
-  setNewScheduleRId('');
-  setNewScheduleVId('');
-  setNewDepartureTime('');
-  setNewArrivalTime('');
-};
-function formatTimeToISOString(timeStr) {
-  // Ensure timeStr is in "HH:mm:ss" format
-  if (/^\d{2}:\d{2}$/.test(timeStr)) {
-    timeStr += ":00";
-  }
-
-  return `1970-01-01T${timeStr}Z`;
-}
-
-
-
-const createOrUpdateSchedule = async () => {
-  const body = {
-    schedule_id: parseInt(newScheduleId),
-    r_id: parseInt(newScheduleRId),
-    v_id: parseInt(newScheduleVId),
-    departure_time: formatTimeToISOString(newDepartureTime),
-    arrival_time: formatTimeToISOString(newArrivalTime),
-  };
-  
-  console.log("Sending payload:", body);
-
-  try {
-    const token = localStorage.getItem("token");
-
-    const isUpdate = scheduleData.some(s => s.schedule_id === body.schedule_id);
-
-    const url = isUpdate
-      ? `http://localhost:8080/schedule/${body.schedule_id}`
-      : `http://localhost:8080/schedule/`;
-
-    const method = isUpdate ? "put" : "post";
-
-    const res = await axios[method](url, body, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    showSnackbar(isUpdate ? "Schedule updated!" : "Schedule created!");
-    fetchSchedule();
-    resetForm();
-  } catch (err) {
-    console.error("Error saving schedule", err);
-  }
-};
-
-
-
-const fetchScheduleFollowed = async () => {
-  try {
-    const token = localStorage.getItem("token");
-
-    const res = await fetch("http://localhost:8080/schedule-followed/", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    if (!res.ok) throw new Error("Failed to fetch schedule followed");
-
-    const data = await res.json();
-    setScheduleFollowedData(data["Schedule-Followed ID"] || []);
-    setScheduleVehicleId(data["Vehicle ID"]);
-    setShowScheduleFollowedModal(true);
-    showSnackbar("Schedule followed data fetched!");
-  } catch (err) {
-    console.error(err);
-    showSnackbar("Error fetching schedule followed", "error");
-  }
-};
-const createScheduleFollowed = async () => {
-  try {
-    const token = localStorage.getItem("token");
-
-    const res = await fetch("http://localhost:8080/schedule-followed/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        s_id: parseInt(newScheduleSId),
-        r_id: parseInt(newScheduleRId),
-      }),
-    });
-
-    if (!res.ok) throw new Error("Failed to create schedule followed");
-
-    await fetchScheduleFollowed();
-    setNewScheduleSId('');
-    setNewScheduleRId('');
-    showSnackbar("Schedule followed created!");
-  } catch (err) {
-    console.error(err);
-    showSnackbar("Error creating schedule followed", "error");
-  }
-};
-const deleteScheduleFollowed = async (r_id, s_id) => {
-  try {
-    const token = localStorage.getItem("token");
-
-    const res = await fetch(`http://localhost:8080/schedule-followed/${r_id}/${s_id}`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    if (!res.ok) throw new Error("Failed to delete schedule followed");
-
-    await fetchScheduleFollowed();
-    showSnackbar("Schedule followed deleted!");
-  } catch (err) {
-    console.error(err);
-    showSnackbar("Error deleting schedule followed", "error");
-  }
-};
-
-const createRouteFollowed = async () => {
-  try {
-    const token = localStorage.getItem("token");
-
-    const res = await fetch("http://localhost:8080/route-followed/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ r_id: parseInt(newRouteFollowedId) }),
-    });
-
-    if (!res.ok) throw new Error("Failed to create route followed");
-
-    await fetchRouteFollowed(); // Refresh list
-    setNewRouteFollowedId('');
-    showSnackbar("Route followed created!");
-  } catch (err) {
-    console.error(err);
-    showSnackbar("Error creating route followed", "error");
-  }
-};
-const deleteRouteFollowed = async (routeId) => {
-  try {
-    const token = localStorage.getItem("token");
-
-    const res = await fetch(`http://localhost:8080/route-followed/${routeId}`, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    if (!res.ok) throw new Error("Failed to delete route followed");
-
-    await fetchRouteFollowed(); // Refresh list
-    showSnackbar("Route followed deleted!");
-  } catch (err) {
-    console.error(err);
-    showSnackbar("Error deleting route followed", "error");
-  }
-};
-
-const fetchRouteFollowed = async () => {
-  try {
-    const token = localStorage.getItem("token");
-
-    const res = await fetch("http://localhost:8080/route-followed/", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    if (!res.ok) throw new Error("Failed to fetch route followed data");
-
-    const data = await res.json();
-
-    // Expecting data.route_id to be an array
-    setRouteFollowedData(data.route_id || []);
-    setShowRouteFollowedModal(true);
-    showSnackbar("Route followed data fetched!");
-  } catch (err) {
-    console.error(err);
-    showSnackbar("Error fetching route followed data", "error");
-  }
-};
-
-
-
-
-const createRoute = async () => {
-  try {
-    const token = localStorage.getItem("token");
-    const response = await fetch(`http://localhost:8080/routes/${routeId}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        JOURNEY_TIME: journeyTime,
-        START_POINT: startPoint,
-        END_POINT: endPoint,
-        DISTANCE: parseFloat(distance),
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to create route');
-    }
-
-    showSnackbar('Route created successfully!');
-    setShowRouteModal(false);
-    resetRouteFields();
-  } catch (error) {
-    console.error('Error creating route:', error);
-    showSnackbar('Error creating route.', 'error');
-  }
-};
-
-const viewRoute = async () => {
-  try {
-    const token = localStorage.getItem("token");
-    const response = await fetch(`http://localhost:8080/routes/${routeId}`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
-    });
-    console.log('Journey Time:', routeData.journey_time); 
-    if (!response.ok) {
-      throw new Error('Failed to fetch route');
-    }
-
-    const data = await response.json();
-    console.log('Fetched route:', data); // Log the response
-    setRouteData(data); // Store the fetched route data
-    showSnackbar('Route fetched successfully!');
-  } catch (error) {
-    console.error('Error fetching route:', error);
-    showSnackbar('Error fetching route.', 'error');
-  }
-};
-const editRoute = async () => {
-  try {
-    const token = localStorage.getItem("token");
-
-    // Log the journey time for debugging
-    //console.log('Journey Time:', journeyTime);
-
-
-    // Get the current date
-    const response = await fetch(`http://localhost:8080/routes/${routeId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        JOURNEY_TIME: journeyTime,
-        START_POINT: startPoint,
-        END_POINT: endPoint,
-        DISTANCE: parseFloat(distance),
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to update route');
-    }
-
-    showSnackbar('Route updated successfully!');
-    setShowRouteModal(false);
-    resetRouteFields(); // Reset fields after successful update
-  } catch (error) {
-    console.error('Error updating route:', error);
-    showSnackbar('Error updating route.', 'error');
-  }
-};
-
-const deleteRoute = async () => {
-  try {
-    const token = localStorage.getItem("token");
-    const response = await fetch(`http://localhost:8080/routes/${routeId}`, {
-      method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to delete route');
-    }
-
-    showSnackbar('Route deleted successfully!');
-    setShowRouteModal(false);
-    // Reset fields
-    resetRouteFields();
-  } catch (error) {
-    console.error('Error deleting route:', error);
-    showSnackbar('Error deleting route.', 'error');
-  }
-};
-
-const resetRouteFields = () => {
-  setRouteId('');
-  setJourneyTime('');
-  setStartPoint('');
-  setEndPoint('');
-  setDistance('');
-};
-const fetchPerformsMaintenance = async () => {
-  try {
-    const token = localStorage.getItem('token');
-    const response = await fetch('http://localhost:8080/performs-maintenance/', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch performs maintenance records');
-    }
-
-    const data = await response.json();
-    setPerformsMaintenanceData(data); // Store the fetched data
-    setShowPerformsMaintenanceModal(true); // Show the modal
-    showSnackbar('Performs maintenance records retrieved!');
-  } catch (error) {
-    console.error('Error fetching performs maintenance records:', error);
-    showSnackbar('Error fetching performs maintenance records.', 'error');
-  }
-};
-
-// Function to create a new performs maintenance record
-const createPerformsMaintenance = async () => {
-  try {
-    const token = localStorage.getItem('token');
-    const response = await fetch('http://localhost:8080/performs-maintenance/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        m_id: parseInt(newMaintenanceId),
-        staff_id: parseInt(newStaffId),
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to create performs maintenance record');
-    }
-
-    // Fetch updated performs maintenance data
-    await fetchPerformsMaintenance(); // Refresh the performs maintenance data
-    showSnackbar('Performs maintenance record created successfully!');
-    setNewMaintenanceId('');
-    setNewStaffId('');
-  } catch (error) {
-    console.error('Error creating performs maintenance record:', error);
-    showSnackbar('Error creating performs maintenance record.', 'error');
-  }
-};
-
-// Function to delete a performs maintenance record
-const deletePerformsMaintenance = async (m_id, staff_id) => {
-  try {
-    const token = localStorage.getItem('token');
-    const response = await fetch(`http://localhost:8080/performs-maintenance/${m_id}/${staff_id}`, {
-      method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to delete performs maintenance record');
-    }
-
-    // Fetch updated performs maintenance data
-    await fetchPerformsMaintenance(); // Refresh the performs maintenance data
-    showSnackbar('Performs maintenance record deleted successfully!');
-  } catch (error) {
-    console.error('Error deleting performs maintenance record:', error);
-    showSnackbar('Error deleting performs maintenance record.', 'error');
-  }
-};
-// Function to fetch all payments
-const fetchPayments = async () => {
-  try {
-    const token = localStorage.getItem('token');
-    const response = await fetch('http://localhost:8080/payments/', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch payments');
-    }
-
-    const data = await response.json();
-    setPaymentsData(data); // Store the fetched data
-    setShowPaymentsModal(true); // Show the modal
-    showSnackbar('Payments retrieved!');
-  } catch (error) {
-    console.error('Error fetching payments:', error);
-    showSnackbar('Error fetching payments.', 'error');
-  }
-};
-
-// Function to create a new payment
-const createPayment = async () => {
-  try {
-    const token = localStorage.getItem('token');
-    const response = await fetch('http://localhost:8080/payments/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        payment_id: parseInt(newPaymentId),
-        amount: parseFloat(newAmount),
-        method: newMethod,
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to create payment');
-    }
-
-    // Fetch updated payments data
-    await fetchPayments(); // Refresh the payments data
-    showSnackbar('Payment created successfully!');
-    setNewPaymentId('');
-    setNewAmount('');
-    setNewMethod('');
-  } catch (error) {
-    console.error('Error creating payment:', error);
-    showSnackbar('Error creating payment.', 'error');
-  }
-};
-
-// Function to update a payment
-const updatePayment = async () => {
-  try {
-    const token = localStorage.getItem('token');
-    const response = await fetch('http://localhost:8080/payments/', {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        payment_id: parseInt(newPaymentId),
-        amount: parseFloat(newAmount),
-        method: newMethod,
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to update payment');
-    }
-
-    // Fetch updated payments data
-    await fetchPayments(); // Refresh the payments data
-    showSnackbar('Payment updated successfully!');
-  } catch (error) {
-    console.error('Error updating payment:', error);
-    showSnackbar('Error updating payment.', 'error');
-  }
-};
-
-// Function to delete a payment
-const deletePayment = async (payment_id) => {
-  try {
-    const token = localStorage.getItem('token');
-    const response = await fetch(`http://localhost:8080/payments/${payment_id}`, {
-      method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to delete payment');
-    }
-
-    // Fetch updated payments data
-    await fetchPayments(); // Refresh the payments data
-    showSnackbar('Payment deleted successfully!');
-  } catch (error) {
-    console.error('Error deleting payment:', error);
-    showSnackbar('Error deleting payment.', 'error');
-  }
-};
-// Function to fetch all operates on records
-const fetchOperatesOn = async () => {
-  try {
-    const token = localStorage.getItem('token');
-    const response = await fetch('http://localhost:8080/operates_on/', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch operates on records');
-    }
-
-    const data = await response.json();
-    setOperatesOnData(data); // Store the fetched data
-    setShowOperatesOnModal(true); // Show the modal
-    showSnackbar('Operates on records retrieved!');
-  } catch (error) {
-    console.error('Error fetching operates on records:', error);
-    showSnackbar('Error fetching operates on records.', 'error');
-  }
-};
-
-// Function to create a new operates on record
-const createOperatesOn = async () => {
-  try {
-    const token = localStorage.getItem('token');
-    const response = await fetch('http://localhost:8080/operates_on/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        v_id: parseInt(newOperatesOnVehicleId),
-        s_id: parseInt(newOperatesOnStationId),
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to create operates on record');
-    }
-
-    // Fetch updated operates on data
-    await fetchOperatesOn(); // Refresh the operates on data
-    showSnackbar('Operates on record created successfully!');
-    setNewOperatesOnVehicleId('');
-    setNewOperatesOnStationId('');
-  } catch (error) {
-    console.error('Error creating operates on record:', error);
-    showSnackbar('Error creating operates on record.', 'error');
-  }
-};
-
-// Function to delete an operates on record
-const deleteOperatesOn = async (v_id, s_id) => {
-  try {
-    const token = localStorage.getItem('token');
-    const response = await fetch(`http://localhost:8080/operates_on/${v_id}/${s_id}`, {
-      method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to delete operates on record');
-    }
-
-    // Fetch updated operates on data
-    await fetchOperatesOn(); // Refresh the operates on data
-    showSnackbar('Operates on record deleted successfully!');
-  } catch (error) {
-    console.error('Error deleting operates on record:', error);
-    showSnackbar('Error deleting operates on record.', 'error');
-  }
-};
-  const fetchMaintenanceHistory = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:8080/maintenance-history/', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch maintenance history');
-      }
-
-      const data = await response.json();
-      setMaintenanceHistoryData(data); // Store the fetched data
-      setShowMaintenanceHistoryModal(true); // Show the modal
-      showSnackbar('Maintenance history retrieved!');
-    } catch (error) {
-      console.error('Error fetching maintenance history:', error);
-      showSnackbar('Error fetching maintenance history.', 'error');
-    }
-  };
-
-  // Function to create maintenance history
-  const createMaintenanceHistory = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:8080/maintenance-history/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          m_id: parseInt(newMaintenanceId),
-          v_id: parseInt(newVehicleId),
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to create maintenance history');
-      }
-
-      // Fetch updated maintenance history data
-      await fetchMaintenanceHistory(); // Refresh the maintenance history data
-      showSnackbar('Maintenance history created successfully!');
-      setNewMaintenanceId('');
-      setNewVehicleId('');
-    } catch (error) {
-      console.error('Error creating maintenance history:', error);
-      showSnackbar('Error creating maintenance history.', 'error');
-    }
-  };
-
-  // Function to delete maintenance history
-  const deleteMaintenanceHistory = async (m_id, v_id) => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:8080/maintenance-history/${m_id}/${v_id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to delete maintenance history');
-      }
-
-      // Fetch updated maintenance history data
-      await fetchMaintenanceHistory(); // Refresh the maintenance history data
-      showSnackbar('Maintenance history deleted successfully!');
-    } catch (error) {
-      console.error('Error deleting maintenance history:', error);
-      showSnackbar('Error deleting maintenance history.', 'error');
-    }
-  };
-
-  const updateMaintenance = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:8080/maintenance/${editingMaintenanceId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          maintenance_id: parseInt(editingMaintenanceId),
-          v_id: parseInt(editVehicleId),
-          issue_reported: editIssueReported,
-          repair_status: editRepairStatus,
-        }),
-      });
-  
-      if (!response.ok) {
-        throw new Error('Failed to update maintenance record');
-      }
-  
-      // Fetch updated maintenance data
-      await fetchMaintenanceData(); // Refresh the maintenance data
-      showSnackbar('Maintenance record updated successfully!');
-      setEditingMaintenanceId(null); // Clear editing state
-      setEditVehicleId('');
-      setEditIssueReported('');
-      setEditRepairStatus('Pending');
-    } catch (error) {
-      console.error('Error updating maintenance record:', error);
-      showSnackbar('Error updating maintenance record.', 'error');
-    }
-  };
-  const createMaintenance = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:8080/maintenance/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          maintenance_id: parseInt(newMaintenanceId),
-          v_id: parseInt(newVehicleId),
-          issue_reported: newIssueReported,
-          repair_status: newRepairStatus,
-        }),
-      });
-  
-      if (!response.ok) {
-        throw new Error('Failed to create maintenance record');
-      }
-  
-      // Fetch updated maintenance data
-      await fetchMaintenanceData(); // Refresh the maintenance data
-      showSnackbar('Maintenance record created successfully!');
-      setShowCreateMaintenanceForm(false); // Hide the form
-      // Clear the form fields
-      setNewMaintenanceId('');
-      setNewVehicleId('');
-      setNewIssueReported('');
-      setNewRepairStatus('Pending');
-    } catch (error) {
-      console.error('Error creating maintenance record:', error);
-      showSnackbar('Error creating maintenance record.', 'error');
-    }
-  };
-  const deleteMaintenance = async (maintenanceId) => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:8080/maintenance/${maintenanceId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-  
-      if (!response.ok) {
-        throw new Error('Failed to delete maintenance record');
-      }
-  
-      // Fetch updated maintenance data
-      await fetchMaintenanceData(); // Refresh the maintenance data
-      showSnackbar('Maintenance record deleted successfully!');
-    } catch (error) {
-      console.error('Error deleting maintenance record:', error);
-      showSnackbar('Error deleting maintenance record.', 'error');
-    }
-  };
-  const fetchMaintenanceData = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:8080/maintenance/', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch maintenance data');
-      }
-
-      const data = await response.json();
-      setMaintenanceData(data); // Store the fetched data
-      setShowMaintenanceModal(true); // Show the modal
-      showSnackbar('Maintenance data retrieved!');
-    } catch (error) {
-      console.error('Error fetching maintenance data:', error);
-      showSnackbar('Error fetching maintenance data.', 'error');
-    }
-  };
-  const showSnackbar = (message, severity = 'success') => {
-    setSnackbarMessage(message);
-    setSnackbarSeverity(severity);
-    setOpenSnackbar(true);
-  };
-  const fetchAccidentHistory = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:8080/accident-history/', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch accident history');
-      }
-
-      const data = await response.json();
-      setAccidentHistoryData(data); // Store the fetched data
-      setShowAccidentHistoryModal(true); // Show the modal
-      showSnackbar('Accident history retrieved!');
-    } catch (error) {
-      console.error('Error fetching accident history:', error);
-      showSnackbar('Error fetching accident history.', 'error');
-    }
-  };
-  const updateIncidentDescription = async (incidentId, updatedDescription) => {
-    try {
-      const token = localStorage.getItem('token');
-  
-      const response = await fetch(`http://localhost:8080/incident/${incidentId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({ description: updatedDescription }),
-      });
-  
-      if (!response.ok) {
-        throw new Error('Failed to update incident');
-      }
-  
-      const data = await response.json();
-      setEditingIncidentId(null);
-      fetchIncidentData();
-      showSnackbar('Incident updated successfully!');
-    } catch (error) {
-      console.error('Error updating incident:', error);
-      showSnackbar('Error updating incident.', 'error');
-    }
-  };
-  
-  const deleteIncident = async (incidentId) => {
-    try {
-      const token = localStorage.getItem('token');
-  
-      const response = await fetch(`http://localhost:8080/incident/${incidentId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-  
-      if (!response.ok) {
-        throw new Error('Failed to delete incident');
-      }
-  
-      // //console.log('Incident deleted successfully');
-  
-      // Optional: close the modal and refresh the incident list
-      setShowIncidentModal(false);
-  
-      // Optionally remove it from local state if you're storing a list
-      setIncidentData((prev) => prev?.filter((i) => i.incident_id !== incidentId));
-      showSnackbar('Incident deleted successfully!');
-    } catch (error) {
-      console.error('Error deleting incident:', error);
-      showSnackbar('Error deleting incident.', 'error');
-    }
-  };
-  
-  const createIncident = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      // //console.log(newIncidentId , newDescription)
-      const response = await fetch('http://localhost:8080/incident/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          INCIDENT_ID: parseInt(newIncidentId),
-          Description: newDescription,
-        }),
-      });
-  
-      if (!response.ok) {
-        throw new Error('Failed to create incident');
-      }
-  
-      const data = await response.json();
-      // //console.log('Incident created:', data);
-      // setShowIncidentModal(false);
-  
-      // Optionally update local list if your backend returns full incident
-      setIncidentData((prev) => [...prev, data]);
-  
-      // Clear the form and hide it
-      setNewIncidentId('');
-      setNewDescription('');
-      setShowCreateForm(false);
-      fetchIncidentData();
-      showSnackbar('Incident created successfully!');
-    } catch (error) {
-      console.error('Error creating incident:', error);
-      showSnackbar('Error creating incident.', 'error');
-    }
-  };
-  
-  const fetchIncidentData = async () => {    
-    try {
-      const token = localStorage.getItem("token");
-      const res = await fetch("http://localhost:8080/incident/", {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        }
-      });
-  
-      if (!res.ok) throw new Error("Failed to fetch incident");
-  
-      const data = await res.json();
-      setIncidentData(Array.isArray(data) ? data : [data]);
-      setShowIncidentModal(true);
-    } catch (err) {
-      console.error(err);
-      showSnackbar("Error fetching incident", 'error');
-    }
-  };
-  
   const toggleModal = () => setShowModal(prev => !prev);
   const updateVehicle = async () => {
     try {
@@ -1105,104 +170,978 @@ const deleteOperatesOn = async (v_id, s_id) => {
       showSnackbar("Error fetching vehicles", 'error');
     }
   };
-  
-  
-  const getProfile = async () => {
+//===========================Incident===========================
+  const [incidentData, setIncidentData] = useState(null);
+  const [showIncidentModal, setShowIncidentModal] = useState(false);
+  const [editingIncidentId, setEditingIncidentId] = useState(null);
+  const [editedDescription, setEditedDescription] = useState('');  
+  const [newIncidentId, setNewIncidentId] = useState('');
+  const [newDescription, setNewDescription] = useState('');
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const updateIncidentDescription = async (incidentId, updatedDescription) => {
     try {
-      const token = localStorage.getItem("token");
-      const res = await fetch('http://localhost:8080/humans/', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (!res.ok) throw new Error(`Failed to fetch: ${res.status}`);
-
-      const data = await res.json();
-      setProfileData(data);
-      setFormData({
-        FName: data.fname || '',
-        LName: data.lname || '',
-        DOB: data.dob ? data.dob.split('T')[0] : '',
-        Age: data.age || '',
-        V_ID: data.v_id || ''
-      });
-    } catch (err) {
-      console.error(err);
-      showSnackbar("Error fetching profile", 'error');
-    }
-  };
-
-  const updateProfile = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const res = await fetch('http://localhost:8080/humans/', {
+      const token = localStorage.getItem('token');
+  
+      const response = await fetch(`http://localhost:8080/incident/${incidentId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ description: updatedDescription }),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to update incident');
+      }
+  
+      const data = await response.json();
+      setEditingIncidentId(null);
+      fetchIncidentData();
+      showSnackbar('Incident updated successfully!');
+    } catch (error) {
+      console.error('Error updating incident:', error);
+      showSnackbar('Error updating incident.', 'error');
+    }
+  };
+  const deleteIncident = async (incidentId) => {
+    try {
+      const token = localStorage.getItem('token');
+  
+      const response = await fetch(`http://localhost:8080/incident/${incidentId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to delete incident');
+      }
+  
+      // //console.log('Incident deleted successfully');
+  
+      // Optional: close the modal and refresh the incident list
+      setShowIncidentModal(false);
+  
+      // Optionally remove it from local state if you're storing a list
+      setIncidentData((prev) => prev?.filter((i) => i.incident_id !== incidentId));
+      showSnackbar('Incident deleted successfully!');
+    } catch (error) {
+      console.error('Error deleting incident:', error);
+      showSnackbar('Error deleting incident.', 'error');
+    }
+  };
+  const createIncident = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      // //console.log(newIncidentId , newDescription)
+      const response = await fetch('http://localhost:8080/incident/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
-          ...formData,
-          Age: parseInt(formData.Age),
-          V_ID: parseInt(formData.V_ID),
+          INCIDENT_ID: parseInt(newIncidentId),
+          Description: newDescription,
+        }),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to create incident');
+      }
+  
+      const data = await response.json();
+      // //console.log('Incident created:', data);
+      // setShowIncidentModal(false);
+  
+      // Optionally update local list if your backend returns full incident
+      setIncidentData((prev) => [...prev, data]);
+  
+      // Clear the form and hide it
+      setNewIncidentId('');
+      setNewDescription('');
+      setShowCreateForm(false);
+      fetchIncidentData();
+      showSnackbar('Incident created successfully!');
+    } catch (error) {
+      console.error('Error creating incident:', error);
+      showSnackbar('Error creating incident.', 'error');
+    }
+  };
+  const fetchIncidentData = async () => {    
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch("http://localhost:8080/incident/", {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        }
+      });
+  
+      if (!res.ok) throw new Error("Failed to fetch incident");
+  
+      const data = await res.json();
+      setIncidentData(Array.isArray(data) ? data : [data]);
+      setShowIncidentModal(true);
+    } catch (err) {
+      console.error(err);
+      showSnackbar("Error fetching incident", 'error');
+    }
+  };
+//===========================Snackbar===========================
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+  const showSnackbar = (message, severity = 'success') => {
+    setSnackbarMessage(message);
+    setSnackbarSeverity(severity);
+    setOpenSnackbar(true);
+  };
+  const Alert = React.forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+  });
+//===========================Maintenance===========================
+  const [newMaintenanceId, setNewMaintenanceId] = useState('');
+  const [maintenanceData, setMaintenanceData] = useState([]);
+  const [showMaintenanceModal, setShowMaintenanceModal] = useState(false); // State to control maintenance modal visibility
+  const [editingMaintenanceId, setEditingMaintenanceId] = useState(null);
+  const updateMaintenance = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:8080/maintenance/${editingMaintenanceId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          maintenance_id: parseInt(editingMaintenanceId),
+          v_id: parseInt(editVehicleId),
+          issue_reported: editIssueReported,
+          repair_status: editRepairStatus,
+        }),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to update maintenance record');
+      }
+  
+      // Fetch updated maintenance data
+      await fetchMaintenanceData(); // Refresh the maintenance data
+      showSnackbar('Maintenance record updated successfully!');
+      setEditingMaintenanceId(null); // Clear editing state
+      setEditVehicleId('');
+      setEditIssueReported('');
+      setEditRepairStatus('Pending');
+    } catch (error) {
+      console.error('Error updating maintenance record:', error);
+      showSnackbar('Error updating maintenance record.', 'error');
+    }
+  };
+  const deleteMaintenance = async (maintenanceId) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:8080/maintenance/${maintenanceId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to delete maintenance record');
+      }
+  
+      // Fetch updated maintenance data
+      await fetchMaintenanceData(); // Refresh the maintenance data
+      showSnackbar('Maintenance record deleted successfully!');
+    } catch (error) {
+      console.error('Error deleting maintenance record:', error);
+      showSnackbar('Error deleting maintenance record.', 'error');
+    }
+  };
+  const fetchMaintenanceData = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:8080/maintenance/', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch maintenance data');
+      }
+
+      const data = await response.json();
+      setMaintenanceData(data); // Store the fetched data
+      setShowMaintenanceModal(true); // Show the modal
+      showSnackbar('Maintenance data retrieved!');
+    } catch (error) {
+      console.error('Error fetching maintenance data:', error);
+      showSnackbar('Error fetching maintenance data.', 'error');
+    }
+  };
+//===========================Maintenance History===========================
+  const [maintenanceHistoryData, setMaintenanceHistoryData] = useState([]);
+  const [showMaintenanceHistoryModal, setShowMaintenanceHistoryModal] = useState(false);
+  const fetchMaintenanceHistory = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:8080/maintenance-history/', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch maintenance history');
+      }
+
+      const data = await response.json();
+      setMaintenanceHistoryData(data); // Store the fetched data
+      setShowMaintenanceHistoryModal(true); // Show the modal
+      showSnackbar('Maintenance history retrieved!');
+    } catch (error) {
+      console.error('Error fetching maintenance history:', error);
+      showSnackbar('Error fetching maintenance history.', 'error');
+    }
+  };
+  const createMaintenanceHistory = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:8080/maintenance-history/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          m_id: parseInt(newMaintenanceId),
+          v_id: parseInt(newVehicleId),
         }),
       });
 
-      if (res.ok) {
-        showSnackbar("Profile updated successfully!");
-        getProfile();
-      } else {
-        const text = await res.text();
-        if (text.includes("foreign key constraint fails")) {
-          setErrorMessage("Can't delete: MySQL foreign key rule.");
-          setShowErrorModal(true);
-        } else {
-          showSnackbar("Error updating profile", 'error');
-        }
+      if (!response.ok) {
+        throw new Error('Failed to create maintenance history');
       }
-    } catch (err) {
-      console.error(err);
-      showSnackbar("server error", 'error');
+
+      // Fetch updated maintenance history data
+      await fetchMaintenanceHistory(); // Refresh the maintenance history data
+      showSnackbar('Maintenance history created successfully!');
+      setNewMaintenanceId('');
+      setNewVehicleId('');
+    } catch (error) {
+      console.error('Error creating maintenance history:', error);
+      showSnackbar('Error creating maintenance history.', 'error');
     }
   };
-
-  const deleteProfile = async () => {
-    const confirmDelete = window.confirm('Are you sure you want to delete your profile?');
-    if (!confirmDelete) return;
-
+  const deleteMaintenanceHistory = async (m_id, v_id) => {
     try {
-      const token = localStorage.getItem("token");
-      const res = await fetch('http://localhost:8080/humans/', {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:8080/maintenance-history/${m_id}/${v_id}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          'Authorization': `Bearer ${token}`,
+        },
       });
 
-      if (res.ok) {
-        showSnackbar("profile deleted successfully");
-        setProfileData(null);
-        setShowModal(false);
-      } else {
-        const text = await res.text();
-          setErrorMessage("Can't delete: MySQL foreign key rule bro.");
-          setShowErrorModal(true);
-        //   alert('Failed to delete profile');
-        
+      if (!response.ok) {
+        throw new Error('Failed to delete maintenance history');
       }
-    } catch (err) {
-      console.error(err);
-      alert('Server error');
+
+      // Fetch updated maintenance history data
+      await fetchMaintenanceHistory(); // Refresh the maintenance history data
+      showSnackbar('Maintenance history deleted successfully!');
+    } catch (error) {
+      console.error('Error deleting maintenance history:', error);
+      showSnackbar('Error deleting maintenance history.', 'error');
     }
   };
-  const theme = createTheme({
-    palette: {
-      mode: isDarkMode ? 'dark' : 'light',
-    },
-  });
+//===========================Accident History===========================
+  const [accidentHistoryData, setAccidentHistoryData] = useState([]);
+  const [showAccidentHistoryModal, setShowAccidentHistoryModal] = useState(false);
+  const [editVehicleId, setEditVehicleId] = useState('');
+  const [editIssueReported, setEditIssueReported] = useState('');
+  const [editRepairStatus, setEditRepairStatus] = useState('Pending');
+  const fetchAccidentHistory = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:8080/accident-history/', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch accident history');
+      }
+
+      const data = await response.json();
+      setAccidentHistoryData(data); // Store the fetched data
+      setShowAccidentHistoryModal(true); // Show the modal
+      showSnackbar('Accident history retrieved!');
+    } catch (error) {
+      console.error('Error fetching accident history:', error);
+      showSnackbar('Error fetching accident history.', 'error');
+    }
+  };
+//===========================Operates on===========================
+  const [operatesOnData, setOperatesOnData] = useState([]);
+  const [showOperatesOnModal, setShowOperatesOnModal] = useState(false);
+  const [newOperatesOnVehicleId, setNewOperatesOnVehicleId] = useState('');
+  const [newOperatesOnStationId, setNewOperatesOnStationId] = useState('');
+  const fetchOperatesOn = async () => {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch('http://localhost:8080/operates_on/', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch operates on records');
+    }
+
+    const data = await response.json();
+    setOperatesOnData(data); // Store the fetched data
+    setShowOperatesOnModal(true); // Show the modal
+    showSnackbar('Operates on records retrieved!');
+  } catch (error) {
+    console.error('Error fetching operates on records:', error);
+    showSnackbar('Error fetching operates on records.', 'error');
+  }
+};
+const createOperatesOn = async () => {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch('http://localhost:8080/operates_on/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        v_id: parseInt(newOperatesOnVehicleId),
+        s_id: parseInt(newOperatesOnStationId),
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to create operates on record');
+    }
+
+    // Fetch updated operates on data
+    await fetchOperatesOn(); // Refresh the operates on data
+    showSnackbar('Operates on record created successfully!');
+    setNewOperatesOnVehicleId('');
+    setNewOperatesOnStationId('');
+  } catch (error) {
+    console.error('Error creating operates on record:', error);
+    showSnackbar('Error creating operates on record.', 'error');
+  }
+};
+const deleteOperatesOn = async (v_id, s_id) => {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`http://localhost:8080/operates_on/${v_id}/${s_id}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to delete operates on record');
+    }
+
+    // Fetch updated operates on data
+    await fetchOperatesOn(); // Refresh the operates on data
+    showSnackbar('Operates on record deleted successfully!');
+  } catch (error) {
+    console.error('Error deleting operates on record:', error);
+    showSnackbar('Error deleting operates on record.', 'error');
+  }
+};
+//===========================Payment===========================
+  const [paymentsData, setPaymentsData] = useState([]);
+  const [showPaymentsModal, setShowPaymentsModal] = useState(false);
+  const [newPaymentId, setNewPaymentId] = useState('');
+  const [newAmount, setNewAmount] = useState('');
+  const [newMethod, setNewMethod] = useState('');
+  const fetchPayments = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:8080/payments/', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
   
-  return (
+      if (!response.ok) {
+        throw new Error('Failed to fetch payments');
+      }
+  
+      const data = await response.json();
+  
+      // If no data returned (null or empty array), redirect to dashboard
+      if (!data || data.length === 0) {
+        showSnackbar('No payment found.', 'info');
+        window.location.href = '/dashboard';
+        return;
+      }
+  
+      setPaymentsData(data); // Store the fetched data
+      setShowPaymentsModal(true); // Show the modal
+      showSnackbar('Payments retrieved!');
+    } catch (error) {
+      console.error('Error fetching payments:', error);
+      showSnackbar('Error fetching payments.', 'error');
+    }
+  };
+  const createPayment = async () => {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch('http://localhost:8080/payments/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        payment_id: parseInt(newPaymentId),
+        amount: parseFloat(newAmount),
+        method: newMethod,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to create payment');
+    }
+
+    // Fetch updated payments data
+    await fetchPayments(); // Refresh the payments data
+    showSnackbar('Payment created successfully!');
+    setNewPaymentId('');
+    setNewAmount('');
+    setNewMethod('');
+  } catch (error) {
+    console.error('Error creating payment:', error);
+    showSnackbar('Error creating payment.', 'error');
+  }
+};
+const updatePayment = async () => {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch('http://localhost:8080/payments/', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        payment_id: parseInt(newPaymentId),
+        amount: parseFloat(newAmount),
+        method: newMethod,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to update payment');
+    }
+
+    // Fetch updated payments data
+    await fetchPayments(); // Refresh the payments data
+    showSnackbar('Payment updated successfully!');
+  } catch (error) {
+    console.error('Error updating payment:', error);
+    showSnackbar('Error updating payment.', 'error');
+  }
+};
+const deletePayment = async (payment_id) => {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`http://localhost:8080/payments/${payment_id}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to delete payment');
+    }
+
+    // Fetch updated payments data
+    await fetchPayments(); // Refresh the payments data
+    showSnackbar('Payment deleted successfully!');
+  } catch (error) {
+    console.error('Error deleting payment:', error);
+    showSnackbar('Error deleting payment.', 'error');
+  }
+};
+//===========================Performs Maintenance===========================
+  const [performsMaintenanceData, setPerformsMaintenanceData] = useState([]);
+  const [showPerformsMaintenanceModal, setShowPerformsMaintenanceModal] = useState(false);
+  const [newStaffId, setNewStaffId] = useState('');
+  const fetchPerformsMaintenance = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:8080/performs-maintenance/', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to fetch performs maintenance records');
+      }
+  
+      const data = await response.json();
+      setPerformsMaintenanceData(data); // Store the fetched data
+      setShowPerformsMaintenanceModal(true); // Show the modal
+      showSnackbar('Performs maintenance records retrieved!');
+    } catch (error) {
+      console.error('Error fetching performs maintenance records:', error);
+      showSnackbar('Error fetching performs maintenance records.', 'error');
+    }
+  };
+  const createPerformsMaintenance = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:8080/performs-maintenance/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          m_id: parseInt(newMaintenanceId),
+          staff_id: parseInt(newStaffId),
+        }),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to create performs maintenance record');
+      }
+  
+      // Fetch updated performs maintenance data
+      await fetchPerformsMaintenance(); // Refresh the performs maintenance data
+      showSnackbar('Performs maintenance record created successfully!');
+      setNewMaintenanceId('');
+      setNewStaffId('');
+    } catch (error) {
+      console.error('Error creating performs maintenance record:', error);
+      showSnackbar('Error creating performs maintenance record.', 'error');
+    }
+  };
+  const deletePerformsMaintenance = async (m_id, staff_id) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:8080/performs-maintenance/${m_id}/${staff_id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to delete performs maintenance record');
+      }
+  
+      // Fetch updated performs maintenance data
+      await fetchPerformsMaintenance(); // Refresh the performs maintenance data
+      showSnackbar('Performs maintenance record deleted successfully!');
+    } catch (error) {
+      console.error('Error deleting performs maintenance record:', error);
+      showSnackbar('Error deleting performs maintenance record.', 'error');
+    }
+  };
+//===========================Route===========================
+  const [showRouteModal, setShowRouteModal] = useState(false);
+  const [routeOperation, setRouteOperation] = useState('');
+  const [routeId, setRouteId] = useState('');
+  const [journeyTime, setJourneyTime] = useState('');
+  const [newRouteFollowedId, setNewRouteFollowedId] = useState('');
+  const [startPoint, setStartPoint] = useState('');
+  const [endPoint, setEndPoint] = useState('');
+  const [distance, setDistance] = useState('');
+  const [routeData, setRouteData] = useState(null);
+  const createRoute = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`http://localhost:8080/routes/${routeId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          JOURNEY_TIME: journeyTime,
+          START_POINT: startPoint,
+          END_POINT: endPoint,
+          DISTANCE: parseFloat(distance),
+        }),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to create route');
+      }
+  
+      showSnackbar('Route created successfully!');
+      setShowRouteModal(false);
+      resetRouteFields();
+    } catch (error) {
+      console.error('Error creating route:', error);
+      showSnackbar('Error creating route.', 'error');
+    }
+  };
+  const viewRoute = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`http://localhost:8080/routes/${routeId}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      console.log('Journey Time:', routeData.journey_time); 
+      if (!response.ok) {
+        throw new Error('Failed to fetch route');
+      }
+  
+      const data = await response.json();
+      console.log('Fetched route:', data); // Log the response
+      setRouteData(data); // Store the fetched route data
+      showSnackbar('Route fetched successfully!');
+    } catch (error) {
+      console.error('Error fetching route:', error);
+      showSnackbar('Error fetching route.', 'error');
+    }
+  };
+  const editRoute = async () => {
+    try {
+      const token = localStorage.getItem("token");
+  
+      // Log the journey time for debugging
+      //console.log('Journey Time:', journeyTime);
+  
+  
+      // Get the current date
+      const response = await fetch(`http://localhost:8080/routes/${routeId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          JOURNEY_TIME: journeyTime,
+          START_POINT: startPoint,
+          END_POINT: endPoint,
+          DISTANCE: parseFloat(distance),
+        }),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to update route');
+      }
+  
+      showSnackbar('Route updated successfully!');
+      setShowRouteModal(false);
+      resetRouteFields(); // Reset fields after successful update
+    } catch (error) {
+      console.error('Error updating route:', error);
+      showSnackbar('Error updating route.', 'error');
+    }
+  };
+  const deleteRoute = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`http://localhost:8080/routes/${routeId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to delete route');
+      }
+  
+      showSnackbar('Route deleted successfully!');
+      setShowRouteModal(false);
+      // Reset fields
+      resetRouteFields();
+    } catch (error) {
+      console.error('Error deleting route:', error);
+      showSnackbar('Error deleting route.', 'error');
+    }
+  }; 
+//===========================Route Followed===========================
+  const [routeFollowedData, setRouteFollowedData] = useState([]);
+  const [showRouteFollowedModal, setShowRouteFollowedModal] = useState(false);
+  const [scheduleFollowedData, setScheduleFollowedData] = useState([]);
+  const createRouteFollowed = async () => {
+    try {
+      const token = localStorage.getItem("token");
+  
+      const res = await fetch("http://localhost:8080/route-followed/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ r_id: parseInt(newRouteFollowedId) }),
+      });
+  
+      if (!res.ok) throw new Error("Failed to create route followed");
+  
+      await fetchRouteFollowed(); // Refresh list
+      setNewRouteFollowedId('');
+      showSnackbar("Route followed created!");
+    } catch (err) {
+      console.error(err);
+      showSnackbar("Error creating route followed", "error");
+    }
+  };
+  const deleteRouteFollowed = async (routeId) => {
+    try {
+      const token = localStorage.getItem("token");
+  
+      const res = await fetch(`http://localhost:8080/route-followed/${routeId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+  
+      if (!res.ok) throw new Error("Failed to delete route followed");
+  
+      await fetchRouteFollowed(); // Refresh list
+      showSnackbar("Route followed deleted!");
+    } catch (err) {
+      console.error(err);
+      showSnackbar("Error deleting route followed", "error");
+    }
+  };
+  
+  const fetchRouteFollowed = async () => {
+    try {
+      const token = localStorage.getItem("token");
+  
+      const res = await fetch("http://localhost:8080/route-followed/", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+  
+      if (!res.ok) throw new Error("Failed to fetch route followed data");
+  
+      const data = await res.json();
+  
+      // Expecting data.route_id to be an array
+      setRouteFollowedData(data.route_id || []);
+      setShowRouteFollowedModal(true);
+      showSnackbar("Route followed data fetched!");
+    } catch (err) {
+      console.error(err);
+      showSnackbar("Error fetching route followed data", "error");
+    }
+  };  
+  const resetRouteFields = () => {
+    setRouteId('');
+    setJourneyTime('');
+    setStartPoint('');
+    setEndPoint('');
+    setDistance('');
+  };  
+//===========================Schedule Followed===========================
+  const [showScheduleFollowedModal, setShowScheduleFollowedModal] = useState(false);
+  const [newScheduleRId, setNewScheduleRId] = useState('');
+  const fetchScheduleFollowed = async () => {
+    try {
+      const token = localStorage.getItem("token");
+  
+      const res = await fetch("http://localhost:8080/schedule-followed/", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+  
+      if (!res.ok) throw new Error("Failed to fetch schedule followed");
+  
+      const data = await res.json();
+      setScheduleFollowedData(data["Schedule-Followed ID"] || []);
+      setScheduleVehicleId(data["Vehicle ID"]);
+      setShowScheduleFollowedModal(true);
+      showSnackbar("Schedule followed data fetched!");
+    } catch (err) {
+      console.error(err);
+      showSnackbar("Error fetching schedule followed", "error");
+    }
+  };
+  const createScheduleFollowed = async () => {
+    try {
+      const token = localStorage.getItem("token");
+  
+      const res = await fetch("http://localhost:8080/schedule-followed/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          s_id: parseInt(newScheduleSId),
+          r_id: parseInt(newScheduleRId),
+        }),
+      });
+  
+      if (!res.ok) throw new Error("Failed to create schedule followed");
+  
+      await fetchScheduleFollowed();
+      setNewScheduleSId('');
+      setNewScheduleRId('');
+      showSnackbar("Schedule followed created!");
+    } catch (err) {
+      console.error(err);
+      showSnackbar("Error creating schedule followed", "error");
+    }
+  };
+//===========================Schedule===========================
+  const [scheduleData, setScheduleData] = useState([]);
+  const [showScheduleModal, setShowScheduleModal] = useState(false);
+  const [newScheduleId, setNewScheduleId] = useState('');
+  const [newScheduleVId, setNewScheduleVId] = useState('');
+  const [newDepartureTime, setNewDepartureTime] = useState('');
+  const [newArrivalTime, setNewArrivalTime] = useState('');
+  const [newScheduleSId, setNewScheduleSId] = useState('');
+  const fetchSchedule = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch("http://localhost:8080/schedule/", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      
+      if (!res.ok) throw new Error("Failed to fetch schedule");
+      
+      const data = await res.json();
+      console.log(data)
+      const normalized = Array.isArray(data) ? data : [data];
+      setScheduleData(normalized);
+      setShowScheduleModal(true);
+      showSnackbar("Schedule data fetched!");
+    } catch (err) {
+      console.error(err);
+      showSnackbar("Error fetching schedule", "error");
+    }
+  };
+  const deleteSchedule = async (scheduleId) => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`http://localhost:8080/schedule/${scheduleId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+  
+      if (!res.ok) throw new Error("Failed to delete schedule");
+  
+      showSnackbar("Schedule deleted successfully!");
+      fetchSchedule();
+    } catch (err) {
+      console.error(err);
+      showSnackbar("Error deleting schedule", "error");
+    }
+  };
+  const createOrUpdateSchedule = async () => {
+    const body = {
+      schedule_id: parseInt(newScheduleId),
+      r_id: parseInt(newScheduleRId),
+      v_id: parseInt(newScheduleVId),
+      departure_time: formatTimeToISOString(newDepartureTime),
+      arrival_time: formatTimeToISOString(newArrivalTime),
+    };
+    
+    console.log("Sending payload:", body);
+  
+    try {
+      const token = localStorage.getItem("token");
+  
+      const isUpdate = scheduleData.some(s => s.schedule_id === body.schedule_id);
+  
+      const url = isUpdate
+        ? `http://localhost:8080/schedule/${body.schedule_id}`
+        : `http://localhost:8080/schedule/`;
+  
+      const method = isUpdate ? "put" : "post";
+  
+      const res = await axios[method](url, body, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+  
+      showSnackbar(isUpdate ? "Schedule updated!" : "Schedule created!");
+      fetchSchedule();
+      resetForm();
+    } catch (err) {
+      console.error("Error saving schedule", err);
+    }
+  };
+//===========================Helpers===========================
+const resetForm = () => {
+  setNewScheduleId('');
+  setNewScheduleRId('');
+  setNewScheduleVId('');
+  setNewDepartureTime('');
+  setNewArrivalTime('');
+};
+function formatTimeToISOString(timeStr) {
+  // Ensure timeStr is in "HH:mm:ss" format
+  if (/^\d{2}:\d{2}$/.test(timeStr)) {
+    timeStr += ":00";
+  }
+
+  return `1970-01-01T${timeStr}Z`;
+}
+const theme = createTheme({
+  palette: {
+    mode: isDarkMode ? 'dark' : 'light',
+  },
+});
+//==========================Logout===============================
+const logout = async () => {
+  try {
+    const token = localStorage.getItem('token');
+    await fetch('http://localhost:8080/auth/logout', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+  } catch (error) {
+    console.error('Logout failed:', error);
+  }
+
+  localStorage.removeItem('token');
+  showSnackbar('Logged out successfully!', 'info');
+  window.location.href = '/human-create'; // or use navigate('/login') with React Router
+};
+
+//===============================================================
+return (
     <div className="container mt-5">
       <h2>Welcome to Dashboard</h2>
 
@@ -1223,7 +1162,8 @@ const deleteOperatesOn = async (v_id, s_id) => {
           Vehicles
         </button>
         <div style={{ position: "fixed", bottom: "20px", right: "20px", zIndex: 999 }}>
-  <Dropdown>
+          {/* No Need For user to see this*/}
+  {/* <Dropdown>
   <Dropdown.Toggle variant="success" id="dropdown-basic">
     ⚙️
       <i className="fas fa-cog"></i>
@@ -1237,11 +1177,11 @@ const deleteOperatesOn = async (v_id, s_id) => {
       <Dropdown.Item onClick={fetchScheduleFollowed}>Schedule Followed</Dropdown.Item>
       <Dropdown.Item onClick={fetchRouteFollowed}>Route Followed</Dropdown.Item>
     </Dropdown.Menu>
-  </Dropdown>
+  </Dropdown> */}
 </div>
 
       </div>
-      {showScheduleFollowedModal && (
+{showScheduleFollowedModal && (
   <div className="modal d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
     <div className="modal-dialog" role="document">
       <div className="modal-content p-3">
@@ -1489,7 +1429,7 @@ const deleteOperatesOn = async (v_id, s_id) => {
     </div>
   </div>
 )}
-      {showMaintenanceHistoryModal && (
+{showMaintenanceHistoryModal && (
         <div className="modal d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
           <div className="modal-dialog" role="document">
             <div className="modal-content p-3">
@@ -1560,8 +1500,8 @@ const deleteOperatesOn = async (v_id, s_id) => {
             </div>
           </div>
         </div>
-      )}
-      {showAccidentHistoryModal && (
+)}
+{showAccidentHistoryModal && (
         <div className="modal d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
           <div className="modal-dialog" role="document">
             <div className="modal-content p-3">
@@ -1599,8 +1539,8 @@ const deleteOperatesOn = async (v_id, s_id) => {
             </div>
           </div>
         </div>
-      )}
-      <div className="position-absolute top-0 end-0 p-3 d-flex gap-2 align-items-start">
+)}
+<div className="position-absolute top-0 end-0 p-3 d-flex gap-2 align-items-start">
         {/* Dark Mode Button */}
         <button
           className={`btn btn-sm ${isDarkMode ? 'btn-light' : 'btn-dark'}`}
@@ -1647,17 +1587,15 @@ const deleteOperatesOn = async (v_id, s_id) => {
       </li>
             <li>
             <button className="dropdown-item" onClick={() => {
-  setShowRouteModal(true); // Open the modal
-  // setRouteOperation('CREATE'); // Set operation to CREATE
-  // resetRouteFields(); // Reset the form fields
+  setShowRouteModal(true);
 }}>
   Manage Route
 </button>
       </li>
           </ul>
         </div>
-      </div>
-      {showScheduleModal && (
+</div>
+{showScheduleModal && (
   <div className="modal d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
     <div className="modal-dialog modal-lg" role="document">
       <div className="modal-content p-3">
@@ -1784,7 +1722,6 @@ const deleteOperatesOn = async (v_id, s_id) => {
     </div>
   </div>
 )}
-
 {showRouteModal && (
   <div className="modal d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
     <div className="modal-dialog" role="document">
@@ -1924,7 +1861,6 @@ const deleteOperatesOn = async (v_id, s_id) => {
     </div>
   </div>
 )}
-
 {showPaymentsModal && (
   <div className="modal d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
     <div className="modal-dialog" role="document">
@@ -1990,14 +1926,22 @@ const deleteOperatesOn = async (v_id, s_id) => {
               />
             </div>
             <div className="mb-2">
-              <input
-                type="text"
-                className="form-control"
-                placeholder="Method"
-                value={newMethod}
-                onChange={(e) => setNewMethod(e.target.value)}
-              />
-            </div>
+                <select
+                  className="form-control"
+                  value={newMethod}
+                  onChange={(e) => setNewMethod(e.target.value)}
+                  required
+                >
+                  <option value="">Select Payment Method</option>
+                  <option value="Cash">Cash</option>
+                  <option value="Credit Card">Credit Card</option>
+                  <option value="Debit Card">Debit Card</option>
+                  <option value="Mobile Payment">Mobile Payment</option>
+                  <option value="Bank Transfer">Bank Transfer</option>
+                  <option value="UPI">UPI</option>
+                  <option value="Crypto">Crypto</option>
+                </select>
+              </div>
             <button className="btn btn-success" onClick={createPayment}>
               Create
             </button>
@@ -2019,7 +1963,7 @@ const deleteOperatesOn = async (v_id, s_id) => {
           <button type="button" className="btn-close" onClick={() => setShowMaintenanceModal(false)}></button>
         </div>
         <div className="modal-body">
-          {maintenanceData.length > 0 ? (
+          {Array.isArray(maintenanceData) && maintenanceData.length > 0 ?(
             <div className="table-responsive">
               <table className="table table-striped table-bordered">
                 <thead>
@@ -2028,7 +1972,7 @@ const deleteOperatesOn = async (v_id, s_id) => {
                     <th style={{ width: '20%' }}>Vehicle ID</th>
                     <th style={{ width: '40%' }}>Issue Reported</th>
                     <th style={{ width: '10%' }}>Repair Status</th>
-                    <th style={{ width: '10%' }}>Actions</th> {/* New column for actions */}
+                    <th style={{ width: '10%' }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -2065,10 +2009,6 @@ const deleteOperatesOn = async (v_id, s_id) => {
           ) : (
             <p>No maintenance records available.</p>
           )}
-          <button className="btn btn-primary mt-3" onClick={() => setShowCreateMaintenanceForm(true)}>
-            Create Maintenance
-          </button>
-
           {editingMaintenanceId && (
             <div className="mt-3">
               <h6>Edit Maintenance Record</h6>
@@ -2087,8 +2027,8 @@ const deleteOperatesOn = async (v_id, s_id) => {
                   className="form-control"
                   placeholder="Vehicle ID"
                   value={editVehicleId}
-                  onChange={(e) => setEditVehicleId(e.target.value)}
-                />
+                  readOnly
+/>
               </div>
               <div className="mb-2">
                 <input
@@ -2147,7 +2087,7 @@ const deleteOperatesOn = async (v_id, s_id) => {
                     <th>ID</th>
                     <th>Description</th>
                     <th>Time</th>
-                    {/* <th>Status</th> */}
+                    <th>Status</th>
                     <th>Vehicle ID</th>
                   </tr>
                 </thead>
@@ -2423,10 +2363,27 @@ const deleteOperatesOn = async (v_id, s_id) => {
     </div>
   </div>
 )}
+<div className="position-absolute bottom-0 end-1 p-2">
+  <button className="btn btn-outline-danger" onClick={logout}>
+    Logout
+  </button>
+</div>
 
-
-
-      {showErrorModal && (
+<Snackbar
+  open={openSnackbar}
+  autoHideDuration={3000}
+  onClose={() => setOpenSnackbar(false)}
+  anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+>
+  <Alert
+    onClose={() => setOpenSnackbar(false)}
+    severity={snackbarSeverity}
+    sx={{ width: '100%' }}
+  >
+    {snackbarMessage}
+  </Alert>
+</Snackbar>
+{showErrorModal && (
         <div className="modal d-block" tabIndex="-1" role="dialog" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
           <div className="modal-dialog" role="document">
             <div className="modal-content p-3">
@@ -2444,7 +2401,9 @@ const deleteOperatesOn = async (v_id, s_id) => {
           </div>
         </div>
       )}
+
     </div>
+
   );
 }
 

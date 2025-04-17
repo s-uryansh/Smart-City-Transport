@@ -15,3 +15,11 @@
 - [x] Performs Maintenance 
 - [x] Schedule Followed
 - [x] Route Followed
+# Managers
+- [x] Add Vehicle Manager
+- [x] Add Maintenance Manager
+- [x] Add Payment Manager
+- [x] Add Incident Manager
+- [x] Add Schedule Manager
+- [x] Add Route Manager
+- [ ] Accident Manager
