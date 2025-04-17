@@ -22,4 +22,4 @@
 - [x] Add Incident Manager
 - [x] Add Schedule Manager
 - [x] Add Route Manager
-- [ ] Accident Manager
+- [x] Accident Manager
