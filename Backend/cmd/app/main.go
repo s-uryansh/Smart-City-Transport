@@ -31,7 +31,6 @@ func main() {
 	if err != nil {
 		log.Fatal("Error loading config:", err)
 	}
-	r.Run(":" + port)
 	err = db.Connect()
 	if err != nil {
 		log.Fatal("Error connecting to database:", err)
@@ -40,6 +39,7 @@ func main() {
 	r.Use(gin.Logger(), gin.Recovery())
 
 	routes.InitRoutes(r)
+	r.Run(":" + port)
 	// r.Run(port) // Start the server on port 8080
 	db.Close()
 }
