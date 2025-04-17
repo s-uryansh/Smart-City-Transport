@@ -1,8 +1,18 @@
-# Use a recent base image
-FROM ubuntu:22.04 as builder
+FROM ubuntu:22.04 AS builder
 
-# Install Go and CA certificates
-RUN apt-get update && apt-get install -y golang-go ca-certificates
+# Install dependencies: CA certs, wget, and unzip tools
+RUN apt-get update && apt-get install -y wget ca-certificates tzdata
+
+# Set timezone to UTC to avoid SSL validation issues (optional)
+ENV TZ=UTC
+
+# Install Go manually
+ENV GO_VERSION=1.22.2
+RUN wget https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz && \
+    tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz && \
+    ln -s /usr/local/go/bin/go /usr/bin/go
+
+ENV PATH="/usr/local/go/bin:${PATH}"
 
 WORKDIR /app
 
@@ -13,10 +23,9 @@ COPY . .
 
 RUN go build -o server ./cmd/app
 
-# Final stage with runtime only
+# Runtime image
 FROM ubuntu:22.04
 
-# Install CA certificates in runtime too (in case your server uses HTTPS)
 RUN apt-get update && apt-get install -y ca-certificates
 
 COPY --from=builder /app/server .
