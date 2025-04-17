@@ -15,7 +15,7 @@ import (
 func main() {
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = ":8080"
+		port = "8080" // fallback
 	}
 	r := gin.New() // Gin router
 	r.Use(cors.New(cors.Config{
@@ -40,7 +40,7 @@ func main() {
 	r.Use(gin.Logger(), gin.Recovery())
 
 	routes.InitRoutes(r)
-
-	r.Run(port) // Start the server on port 8080
+	r.Run(":" + port)
+	// r.Run(port) // Start the server on port 8080
 	db.Close()
 }

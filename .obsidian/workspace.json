@@ -171,6 +171,7 @@
   },
   "active": "460897f633e21420",
   "lastOpenFiles": [
+    "Backend/smartcity.sql",
     "smartcity-frontend/src/smartcitytransport/node_modules/ajv/scripts/prepare-tests",
     "smartcity-frontend/src/smartcitytransport/node_modules/ajv/scripts/publish-built-version",
     "smartcity-frontend/src/smartcitytransport/node_modules/ajv/scripts/travis-gh-pages",
@@ -181,7 +182,6 @@
     "smartcity-frontend/src/smartcitytransport/node_modules/esquery/dist",
     "smartcity-frontend/src/smartcitytransport/node_modules/emoji-regex/es2015/index.js",
     "smartcity-frontend/src/smartcitytransport/node_modules/emoji-regex/es2015",
-    "smartcity-frontend/src/smartcitytransport/node_modules/language-tags/lib/index.js",
     "smartcity-frontend/src/smartcitytransport/public/window.svg",
     "smartcity-frontend/src/smartcitytransport/public/vercel.svg",
     "smartcity-frontend/src/smartcitytransport/public/next.svg",
