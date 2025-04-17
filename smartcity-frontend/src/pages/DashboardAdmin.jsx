@@ -1349,11 +1349,15 @@ const theme = createTheme({
 // ===========================Returns===========================
 return (
     <div className="container mt-5">
-      <h2>Welcome to Admin Dashboard</h2>
+    <div className="max-w-7xl mx-auto px-6 py-16">
+    <h1 className="text-4xl font-semibold text-center text-gray-800 dark:text-white mb-12">
+        Smart City Transport System
+      </h1>
+      <h2>Welcome Admin</h2>
 
-      <div className="mt-3">
+      <div className="flex justify-center mb-10 gap-4">
         <button
-          className="btn btn-sm btn-light px-1 py-1 me-1"
+          className="bg-white/30 backdrop-blur-md px-4 py-2 rounded-lg shadow hover:shadow-lg transition duration-300 dark:bg-white/10 dark:text-white"
           onClick={() => {
             toggleModal();
             getProfile();
@@ -1362,11 +1366,12 @@ return (
           Profile
         </button>
         <button
-          className="btn btn-sm btn-light px-1 py-1 me-1"
+          className="bg-white/30 backdrop-blur-md px-4 py-2 rounded-lg shadow hover:shadow-lg transition duration-300 dark:bg-white/10 dark:text-white"
           onClick={toggleVehiclesModal}
         >
           Vehicles
         </button>
+      </div>
         <div style={{ position: "fixed", bottom: "20px", right: "20px", zIndex: 999 }}>
           <Dropdown>
             <Dropdown.Toggle variant="success" id="dropdown-basic">
@@ -1382,7 +1387,7 @@ return (
               <Dropdown.Item onClick={fetchRouteFollowed}>Route Followed</Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
-  </div>
+        </div>
 </div>
 {/* Schedule Followed */}
 {showScheduleFollowedModal && (
@@ -2992,7 +2997,7 @@ return (
     {snackbar.message}
   </div>
 )}
-<div className="position-absolute bottom-0 end-1 p-2">
+<div className="position-absolute bottom-0 start-0 p-2">
   <button className="btn btn-outline-danger" onClick={logout}>
     Logout
   </button>

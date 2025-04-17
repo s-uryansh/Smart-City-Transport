@@ -4,6 +4,7 @@ import { Dropdown } from 'react-bootstrap';
 import axios from 'axios';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
+import '../App.css';
 function Dashboard() {
 //===========================Profile===========================
   const [showModal, setShowModal] = useState(false);
@@ -820,13 +821,13 @@ const deletePayment = async (payment_id) => {
           'Authorization': `Bearer ${token}`,
         },
       });
-      console.log('Journey Time:', routeData.journey_time); 
+      ////console.log('Journey Time:', routeData.journey_time); 
       if (!response.ok) {
         throw new Error('Failed to fetch route');
       }
   
       const data = await response.json();
-      console.log('Fetched route:', data); // Log the response
+      ////console.log('Fetched route:', data); // Log the response
       setRouteData(data); // Store the fetched route data
       showSnackbar('Route fetched successfully!');
     } catch (error) {
@@ -1140,14 +1141,15 @@ const logout = async () => {
   window.location.href = '/human-create'; // or use navigate('/login') with React Router
 };
 
-//===============================================================
+//==============================Return=================================
 return (
-    <div className="container mt-5">
+<div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-300 dark:from-gray-900 dark:to-gray-800 transition-colors duration-500">
+  <div className="max-w-7xl mx-auto px-6 py-16">
+      <h1 className="text-4xl font-semibold text-center text-gray-800 dark:text-white mb-12">Smart City Transport System</h1>
       <h2>Welcome to Dashboard</h2>
-
-      <div className="mt-3">
+    <div className="flex justify-center mb-10 gap-4">
         <button
-          className="btn btn-sm btn-light px-1 py-1 me-1"
+          className="bg-white/30 backdrop-blur-md px-4 py-2 rounded-lg shadow hover:shadow-lg transition duration-300 dark:bg-white/10 dark:text-white"
           onClick={() => {
             toggleModal();
             getProfile();
@@ -1156,31 +1158,29 @@ return (
           Profile
         </button>
         <button
-          className="btn btn-sm btn-light px-1 py-1 me-1"
+          className="bg-white/30 backdrop-blur-md px-4 py-2 rounded-lg shadow hover:shadow-lg transition duration-300 dark:bg-white/10 dark:text-white"
           onClick={toggleVehiclesModal}
         >
           Vehicles
         </button>
+    </div>
         <div style={{ position: "fixed", bottom: "20px", right: "20px", zIndex: 999 }}>
-          {/* No Need For user to see this*/}
-  {/* <Dropdown>
-  <Dropdown.Toggle variant="success" id="dropdown-basic">
-    ⚙️
-      <i className="fas fa-cog"></i>
-    </Dropdown.Toggle>
-
-    <Dropdown.Menu>
-      <Dropdown.Item onClick={fetchAccidentHistory}>Accident History</Dropdown.Item>
-      <Dropdown.Item onClick={fetchMaintenanceHistory}>Maintenance History</Dropdown.Item>
-      <Dropdown.Item onClick={fetchOperatesOn}>Operates On</Dropdown.Item>
-      <Dropdown.Item onClick={fetchPerformsMaintenance}>Performs Maintenance</Dropdown.Item>
-      <Dropdown.Item onClick={fetchScheduleFollowed}>Schedule Followed</Dropdown.Item>
-      <Dropdown.Item onClick={fetchRouteFollowed}>Route Followed</Dropdown.Item>
-    </Dropdown.Menu>
-  </Dropdown> */}
+          <Dropdown>
+            <Dropdown.Toggle variant="success" id="dropdown-basic">
+              ⚙️
+                <i className="fas fa-cog"></i>
+              </Dropdown.Toggle>
+            <Dropdown.Menu>
+              <Dropdown.Item onClick={fetchAccidentHistory}>Accident History</Dropdown.Item>
+              <Dropdown.Item onClick={fetchMaintenanceHistory}>Maintenance History</Dropdown.Item>
+              <Dropdown.Item onClick={fetchOperatesOn}>Operates On</Dropdown.Item>
+              <Dropdown.Item onClick={fetchPerformsMaintenance}>Performs Maintenance</Dropdown.Item>
+              <Dropdown.Item onClick={fetchScheduleFollowed}>Schedule Followed</Dropdown.Item>
+              <Dropdown.Item onClick={fetchRouteFollowed}>Route Followed</Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
+        </div>
 </div>
-
-      </div>
 {showScheduleFollowedModal && (
   <div className="modal d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
     <div className="modal-dialog" role="document">
@@ -2087,8 +2087,8 @@ return (
                     <th>ID</th>
                     <th>Description</th>
                     <th>Time</th>
-                    <th>Status</th>
                     <th>Vehicle ID</th>
+                    {/* <th>Report Time</th> */}
                   </tr>
                 </thead>
                 <tbody>
@@ -2149,8 +2149,8 @@ return (
                           timeStyle: 'short',
                         })}
                       </td>
-                      {/* <td>{incident.status}</td> */}
                       <td>{incident.v_id}</td>
+                      {/* <td>{incident.report_time_date}</td> */}
                     </tr>
                   ))}
                 </tbody>
@@ -2363,11 +2363,12 @@ return (
     </div>
   </div>
 )}
-<div className="position-absolute bottom-0 end-1 p-2">
+<div className="position-absolute bottom-0 start-0 p-2">
   <button className="btn btn-outline-danger" onClick={logout}>
     Logout
   </button>
 </div>
+
 
 <Snackbar
   open={openSnackbar}

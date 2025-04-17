@@ -1204,25 +1204,30 @@ const logout = async () => {
 
 //===============================================================
 return (
-    <div className="container mt-5">
-      <h2>Welcome to Accident Manager Dashboard</h2>
+  <div className="container mt-5">
+  <div className="max-w-7xl mx-auto px-6 py-16">
+  <h1 className="text-4xl font-semibold text-center text-gray-800 dark:text-white mb-12">
+      Smart City Transport System
+    </h1>
+    <h2>Welcome Accident Manager</h2>
 
-      <div className="mt-3">
-        <button
-          className="btn btn-sm btn-light px-1 py-1 me-1"
-          onClick={() => {
-            toggleModal();
-            getProfile();
-          }}
-        >
-          Profile
-        </button>
-        <button
-          className="btn btn-sm btn-light px-1 py-1 me-1"
-          onClick={toggleVehiclesModal}
-        >
-          Vehicles
-        </button>
+    <div className="flex justify-center mb-10 gap-4">
+      <button
+        className="bg-white/30 backdrop-blur-md px-4 py-2 rounded-lg shadow hover:shadow-lg transition duration-300 dark:bg-white/10 dark:text-white"
+        onClick={() => {
+          toggleModal();
+          getProfile();
+        }}
+      >
+        Profile
+      </button>
+      <button
+        className="bg-white/30 backdrop-blur-md px-4 py-2 rounded-lg shadow hover:shadow-lg transition duration-300 dark:bg-white/10 dark:text-white"
+        onClick={toggleVehiclesModal}
+      >
+        Vehicles
+      </button>
+    </div>
         <div style={{ position: "fixed", bottom: "20px", right: "20px", zIndex: 999 }}>
   <Dropdown>
   <Dropdown.Toggle variant="success" id="dropdown-basic">
@@ -2476,11 +2481,12 @@ return (
     </div>
   </div>
 )}
-<div className="position-absolute bottom-0 end-1 p-2">
+<div className="position-absolute bottom-0 start-0 p-2">
   <button className="btn btn-outline-danger" onClick={logout}>
     Logout
   </button>
 </div>
+
 
 <Snackbar
   open={openSnackbar}
