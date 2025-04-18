@@ -12,7 +12,7 @@ function Dashboard() {
   const getProfile = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch('https://smart-city-transport-301261782088.us-central1.run.app/humans/', {
+      const res = await fetch('https://smart-city-backend-301261782088.asia-south1.run.app/humans/', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -37,7 +37,7 @@ function Dashboard() {
   const updateProfile = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch('https://smart-city-transport-301261782088.us-central1.run.app/humans/', {
+      const res = await fetch('https://smart-city-backend-301261782088.asia-south1.run.app/humans/', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -73,7 +73,7 @@ function Dashboard() {
 
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch('https://smart-city-transport-301261782088.us-central1.run.app/humans/', {
+      const res = await fetch('https://smart-city-backend-301261782088.asia-south1.run.app/humans/', {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -124,7 +124,7 @@ function Dashboard() {
   const bookVehicle = async (vehicleId) => {
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch(`https://smart-city-transport-301261782088.us-central1.run.app/vehicles/${vehicleId}`, {
+      const res = await fetch(`https://smart-city-backend-301261782088.asia-south1.run.app/vehicles/${vehicleId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -154,7 +154,7 @@ function Dashboard() {
   
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("https://smart-city-transport-301261782088.us-central1.run.app/vehicles/all", {
+      const res = await fetch("https://smart-city-backend-301261782088.asia-south1.run.app/vehicles/all", {
         headers: { Authorization: `Bearer ${token}` },
       });
   
@@ -182,7 +182,7 @@ function Dashboard() {
     try {
       const token = localStorage.getItem('token');
   
-      const response = await fetch(`https://smart-city-transport-301261782088.us-central1.run.app/incident/${incidentId}`, {
+      const response = await fetch(`https://smart-city-backend-301261782088.asia-south1.run.app/incident/${incidentId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -208,7 +208,7 @@ function Dashboard() {
     try {
       const token = localStorage.getItem('token');
   
-      const response = await fetch(`https://smart-city-transport-301261782088.us-central1.run.app/incident/${incidentId}`, {
+      const response = await fetch(`https://smart-city-backend-301261782088.asia-south1.run.app/incident/${incidentId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -236,7 +236,7 @@ function Dashboard() {
     try {
       const token = localStorage.getItem('token');
       // //console.log(newIncidentId , newDescription)
-      const response = await fetch('https://smart-city-transport-301261782088.us-central1.run.app/incident/', {
+      const response = await fetch('https://smart-city-backend-301261782088.asia-south1.run.app/incident/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -273,7 +273,7 @@ function Dashboard() {
   const fetchIncidentData = async () => {    
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("https://smart-city-transport-301261782088.us-central1.run.app/incident/", {
+      const res = await fetch("https://smart-city-backend-301261782088.asia-south1.run.app/incident/", {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -310,7 +310,7 @@ function Dashboard() {
   const updateMaintenance = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`https://smart-city-transport-301261782088.us-central1.run.app/maintenance/${editingMaintenanceId}`, {
+      const response = await fetch(`https://smart-city-backend-301261782088.asia-south1.run.app/maintenance/${editingMaintenanceId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -343,7 +343,7 @@ function Dashboard() {
   const deleteMaintenance = async (maintenanceId) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`https://smart-city-transport-301261782088.us-central1.run.app/maintenance/${maintenanceId}`, {
+      const response = await fetch(`https://smart-city-backend-301261782088.asia-south1.run.app/maintenance/${maintenanceId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -365,7 +365,7 @@ function Dashboard() {
   const fetchMaintenanceData = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('https://smart-city-transport-301261782088.us-central1.run.app/maintenance/', {
+      const response = await fetch('https://smart-city-backend-301261782088.asia-south1.run.app/maintenance/', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -392,7 +392,7 @@ function Dashboard() {
   const fetchMaintenanceHistory = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('https://smart-city-transport-301261782088.us-central1.run.app/maintenance-history/', {
+      const response = await fetch('https://smart-city-backend-301261782088.asia-south1.run.app/maintenance-history/', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -416,7 +416,7 @@ function Dashboard() {
   const createMaintenanceHistory = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('https://smart-city-transport-301261782088.us-central1.run.app/maintenance-history/', {
+      const response = await fetch('https://smart-city-backend-301261782088.asia-south1.run.app/maintenance-history/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -445,7 +445,7 @@ function Dashboard() {
   const deleteMaintenanceHistory = async (m_id, v_id) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`https://smart-city-transport-301261782088.us-central1.run.app/maintenance-history/${m_id}/${v_id}`, {
+      const response = await fetch(`https://smart-city-backend-301261782088.asia-south1.run.app/maintenance-history/${m_id}/${v_id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -473,7 +473,7 @@ function Dashboard() {
   const fetchAccidentHistory = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('https://smart-city-transport-301261782088.us-central1.run.app/accident-history/', {
+      const response = await fetch('https://smart-city-backend-301261782088.asia-south1.run.app/accident-history/', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -502,7 +502,7 @@ function Dashboard() {
   const fetchOperatesOn = async () => {
   try {
     const token = localStorage.getItem('token');
-    const response = await fetch('https://smart-city-transport-301261782088.us-central1.run.app/operates_on/', {
+    const response = await fetch('https://smart-city-backend-301261782088.asia-south1.run.app/operates_on/', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -526,7 +526,7 @@ function Dashboard() {
 const createOperatesOn = async () => {
   try {
     const token = localStorage.getItem('token');
-    const response = await fetch('https://smart-city-transport-301261782088.us-central1.run.app/operates_on/', {
+    const response = await fetch('https://smart-city-backend-301261782088.asia-south1.run.app/operates_on/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -555,7 +555,7 @@ const createOperatesOn = async () => {
 const deleteOperatesOn = async (v_id, s_id) => {
   try {
     const token = localStorage.getItem('token');
-    const response = await fetch(`https://smart-city-transport-301261782088.us-central1.run.app/operates_on/${v_id}/${s_id}`, {
+    const response = await fetch(`https://smart-city-backend-301261782088.asia-south1.run.app/operates_on/${v_id}/${s_id}`, {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -583,7 +583,7 @@ const deleteOperatesOn = async (v_id, s_id) => {
   const fetchPayments = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('https://smart-city-transport-301261782088.us-central1.run.app/payments/', {
+      const response = await fetch('https://smart-city-backend-301261782088.asia-south1.run.app/payments/', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -615,7 +615,7 @@ const deleteOperatesOn = async (v_id, s_id) => {
   const createPayment = async () => {
   try {
     const token = localStorage.getItem('token');
-    const response = await fetch('https://smart-city-transport-301261782088.us-central1.run.app/payments/', {
+    const response = await fetch('https://smart-city-backend-301261782088.asia-south1.run.app/payments/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -646,7 +646,7 @@ const deleteOperatesOn = async (v_id, s_id) => {
 const updatePayment = async () => {
   try {
     const token = localStorage.getItem('token');
-    const response = await fetch('https://smart-city-transport-301261782088.us-central1.run.app/payments/', {
+    const response = await fetch('https://smart-city-backend-301261782088.asia-south1.run.app/payments/', {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -674,7 +674,7 @@ const updatePayment = async () => {
 const deletePayment = async (payment_id) => {
   try {
     const token = localStorage.getItem('token');
-    const response = await fetch(`https://smart-city-transport-301261782088.us-central1.run.app/payments/${payment_id}`, {
+    const response = await fetch(`https://smart-city-backend-301261782088.asia-south1.run.app/payments/${payment_id}`, {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -700,7 +700,7 @@ const deletePayment = async (payment_id) => {
   const fetchPerformsMaintenance = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('https://smart-city-transport-301261782088.us-central1.run.app/performs-maintenance/', {
+      const response = await fetch('https://smart-city-backend-301261782088.asia-south1.run.app/performs-maintenance/', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -724,7 +724,7 @@ const deletePayment = async (payment_id) => {
   const createPerformsMaintenance = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('https://smart-city-transport-301261782088.us-central1.run.app/performs-maintenance/', {
+      const response = await fetch('https://smart-city-backend-301261782088.asia-south1.run.app/performs-maintenance/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -753,7 +753,7 @@ const deletePayment = async (payment_id) => {
   const deletePerformsMaintenance = async (m_id, staff_id) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`https://smart-city-transport-301261782088.us-central1.run.app/performs-maintenance/${m_id}/${staff_id}`, {
+      const response = await fetch(`https://smart-city-backend-301261782088.asia-south1.run.app/performs-maintenance/${m_id}/${staff_id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -784,7 +784,7 @@ const deletePayment = async (payment_id) => {
   const createRoute = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`https://smart-city-transport-301261782088.us-central1.run.app/routes/${routeId}`, {
+      const response = await fetch(`https://smart-city-backend-301261782088.asia-south1.run.app/routes/${routeId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -813,7 +813,7 @@ const deletePayment = async (payment_id) => {
   const viewRoute = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`https://smart-city-transport-301261782088.us-central1.run.app/routes/${routeId}`, {
+      const response = await fetch(`https://smart-city-backend-301261782088.asia-south1.run.app/routes/${routeId}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -836,7 +836,7 @@ const deletePayment = async (payment_id) => {
   const editRoute = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`https://smart-city-transport-301261782088.us-central1.run.app/routes/${routeId}`, {
+      const response = await fetch(`https://smart-city-backend-301261782088.asia-south1.run.app/routes/${routeId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -865,7 +865,7 @@ const deletePayment = async (payment_id) => {
   const deleteRoute = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`https://smart-city-transport-301261782088.us-central1.run.app/routes/${routeId}`, {
+      const response = await fetch(`https://smart-city-backend-301261782088.asia-south1.run.app/routes/${routeId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -902,7 +902,7 @@ const deletePayment = async (payment_id) => {
       const token = localStorage.getItem("token");
   
       const res = await fetch(
-        `https://smart-city-transport-301261782088.us-central1.run.app/route-followed/${parseInt(newRouteFollowedId)}/${parseInt(newRouteFollowedVehicleId)}`,
+        `https://smart-city-backend-301261782088.asia-south1.run.app/route-followed/${parseInt(newRouteFollowedId)}/${parseInt(newRouteFollowedVehicleId)}`,
         {
           method: "POST",
           headers: {
@@ -926,7 +926,7 @@ const deletePayment = async (payment_id) => {
     try {
       const token = localStorage.getItem("token");
   
-      const res = await fetch(`https://smart-city-transport-301261782088.us-central1.run.app/route-followed/${routeId}/${vid}`, {
+      const res = await fetch(`https://smart-city-backend-301261782088.asia-south1.run.app/route-followed/${routeId}/${vid}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -946,7 +946,7 @@ const deletePayment = async (payment_id) => {
     try {
       const token = localStorage.getItem("token");
   
-      const res = await fetch("https://smart-city-transport-301261782088.us-central1.run.app/route-followed/all", {
+      const res = await fetch("https://smart-city-backend-301261782088.asia-south1.run.app/route-followed/all", {
         headers: { Authorization: `Bearer ${token}` },
       });
   
@@ -969,7 +969,7 @@ const deletePayment = async (payment_id) => {
     try {
       const token = localStorage.getItem("token");
   
-      const res = await fetch("https://smart-city-transport-301261782088.us-central1.run.app/schedule-followed/", {
+      const res = await fetch("https://smart-city-backend-301261782088.asia-south1.run.app/schedule-followed/", {
         headers: { Authorization: `Bearer ${token}` },
       });
   
@@ -989,7 +989,7 @@ const deletePayment = async (payment_id) => {
     try {
       const token = localStorage.getItem("token");
   
-      const res = await fetch("https://smart-city-transport-301261782088.us-central1.run.app/schedule-followed/", {
+      const res = await fetch("https://smart-city-backend-301261782088.asia-south1.run.app/schedule-followed/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -1023,7 +1023,7 @@ const deletePayment = async (payment_id) => {
   const fetchSchedule = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("https://smart-city-transport-301261782088.us-central1.run.app/schedule/", {
+      const res = await fetch("https://smart-city-backend-301261782088.asia-south1.run.app/schedule/", {
         headers: { Authorization: `Bearer ${token}` },
       });
       
@@ -1043,7 +1043,7 @@ const deletePayment = async (payment_id) => {
   const deleteSchedule = async (scheduleId) => {
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch(`https://smart-city-transport-301261782088.us-central1.run.app/schedule/${scheduleId}`, {
+      const res = await fetch(`https://smart-city-backend-301261782088.asia-south1.run.app/schedule/${scheduleId}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -1076,8 +1076,8 @@ const deletePayment = async (payment_id) => {
       const isUpdate = scheduleData.some(s => s.schedule_id === body.schedule_id);
   
       const url = isUpdate
-        ? `https://smart-city-transport-301261782088.us-central1.run.app/schedule/${body.schedule_id}`
-        : `https://smart-city-transport-301261782088.us-central1.run.app/schedule/`;
+        ? `https://smart-city-backend-301261782088.asia-south1.run.app/schedule/${body.schedule_id}`
+        : `https://smart-city-backend-301261782088.asia-south1.run.app/schedule/`;
   
       const method = isUpdate ? "put" : "post";
   
@@ -1119,7 +1119,7 @@ const theme = createTheme({
 const logout = async () => {
   try {
     const token = localStorage.getItem('token');
-    await fetch('https://smart-city-transport-301261782088.us-central1.run.app/auth/logout', {
+    await fetch('https://smart-city-backend-301261782088.asia-south1.run.app/auth/logout', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,

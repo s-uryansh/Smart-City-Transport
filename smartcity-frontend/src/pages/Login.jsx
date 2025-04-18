@@ -28,7 +28,7 @@ function Login() {
     const { username, password } = formData;
 
     try {
-      const res = await fetch("https://smart-city-transport-301261782088.us-central1.run.app/auth/login", {
+      const res = await fetch("https://smart-city-backend-301261782088.asia-south1.run.app/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password })
