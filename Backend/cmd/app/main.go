@@ -19,28 +19,32 @@ func main() {
 	}
 	r := gin.New() // Gin router
 	r.Use(cors.New(cors.Config{
-		AllowOrigins: []string{"http://localhost:5173"},
-		// AllowOrigins:     []string{"https://smartcitytransport.netlify.app"},
+		// AllowOrigins: []string{"http://localhost:5173"},
+		AllowOrigins:     []string{"https://smart-city-transport.vercel.app/"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
 	}))
+	r.Run(":" + port)
+	log.Println("Server started on port " + port)
+
 	r.RedirectTrailingSlash = false
 	err := config.LoadConfig()
 	if err != nil {
 		log.Fatal("Error loading config:", err)
 	}
+	log.Println("Config loaded successfully")
 	err = db.Connect()
 	if err != nil {
 		log.Fatal("Error connecting to database:", err)
 	}
+	log.Println("Connected to database successfully")
 
 	r.Use(gin.Logger(), gin.Recovery())
-
 	routes.InitRoutes(r)
-	r.Run(":" + port)
-	// r.Run(port) // Start the server on port 8080
+
+	log.Println("Routes initialized successfully")
 	db.Close()
 }

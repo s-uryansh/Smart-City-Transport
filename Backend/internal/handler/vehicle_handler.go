@@ -134,6 +134,20 @@ func DeleteVehicle(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "Vehicle deleted"})
 }
+func UpdateVehicleCount(c *gin.Context) {
+	vid, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid vehicle ID"})
+		log.Println("Error(handler/vehicle): ", err)
+		return
+	}
+	err = repository.UpdateVehicleCountRepo(vid)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not update vehicle count"})
+		log.Println("Error(handler/vehicle): ", err)
+		return
+	}
+}
 func DeleteVehicleByID(c *gin.Context) {
 	vid, err := strconv.Atoi(c.Param("id"))
 	if err != nil {

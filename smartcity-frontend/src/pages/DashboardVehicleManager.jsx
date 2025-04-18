@@ -124,8 +124,6 @@ function Dashboard() {
   const updateVehicle = async () => {
     try {
       const token = localStorage.getItem("token");
-      ////console.log("updating vehicle?");
-      
       const res = await fetch(`http://localhost:8080/vehicles/${selectedVehicleId}`, {
         method: 'PUT',
         headers: {
@@ -147,6 +145,26 @@ function Dashboard() {
       showSnackbar('Server error while updating vehicle.', 'error');
     }
   };
+const resetVehicleBookingCount = async (vehicleId) => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`http://localhost:8080/vehicles/${vehicleId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+      });
+  
+      if (!res.ok) {
+        throw new Error('Failed to reset booking count');
+      }
+      toggleVehiclesModal();
+      showSnackbar('Booking count reset successfully!');
+    } catch (error) {
+      console.error('Error resetting booking count:', error);
+    }
+};
 const toggleVehiclesModal = async () => {
     if (showVehiclesModal) {
       setShowVehiclesModal(false); // If already open, just close it
@@ -2391,6 +2409,12 @@ return (
                             onClick={() => deleteVehicle(vehicle.vehicle_id)}
                           >
                             🗑️ Delete
+                          </button>
+                          <button
+                            className="btn btn-sm btn-secondary"
+                            onClick={() => resetVehicleBookingCount(vehicle.vehicle_id)}
+                          >
+                            🔄 Reset
                           </button>
                         </div>
                       </li>

@@ -3,6 +3,7 @@ package repository
 import (
 	"SmartCityTransportSystem/internal/models"
 	"SmartCityTransportSystem/pkg/db"
+	"log"
 	"time"
 )
 
@@ -45,6 +46,17 @@ func UpdateVehicle(id int, v models.Vehicle) error {
 	_, err := db.DB.Exec("UPDATE vehicle SET CURRENT_LOCATION = ?, STATUS = ?, LAST_UPDATE = ? WHERE VEHICLE_ID = ?",
 		v.CurrentLocation, v.Status, time.Now(), id)
 	return err
+}
+func UpdateVehicleCountRepo(id int) error {
+	_, err := db.DB.Exec("UPDATE bookings SET booking_count = ? WHERE vehicle_id = ?", 0, id)
+	if err != nil {
+		log.Fatal("Error in UpdateVehicleCountRepo: ", err)
+	}
+	_, err = db.DB.Exec("UPDATE vehicle SET status_change = ? , STATUS = ? WHERE VEHICLE_ID = ?", false, "Available", id)
+	if err != nil {
+		log.Fatal("Error in UpdateVehicleCountRepo: ", err)
+	}
+	return nil
 }
 
 // DeleteVehicle deletes a vehicle from the database by ID
