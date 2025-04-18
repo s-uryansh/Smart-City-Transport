@@ -43,6 +43,54 @@ INSERT INTO `accident_history` VALUES (1,1),(2,2),(3,3),(4,4),(5,5),(6,6),(7,7),
 UNLOCK TABLES;
 
 --
+-- Table structure for table `bookings`
+--
+
+DROP TABLE IF EXISTS `bookings`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `bookings` (
+  `vehicle_id` int(11) DEFAULT NULL,
+  `booking_count` int(11) DEFAULT '1'
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `bookings`
+--
+
+LOCK TABLES `bookings` WRITE;
+/*!40000 ALTER TABLE `bookings` DISABLE KEYS */;
+INSERT INTO `bookings` VALUES (1,0),(2,1);
+/*!40000 ALTER TABLE `bookings` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = cp850 */ ;
+/*!50003 SET character_set_results = cp850 */ ;
+/*!50003 SET collation_connection  = cp850_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER update_vehicle_status_on_booking_count
+AFTER UPDATE ON bookings
+FOR EACH ROW
+BEGIN
+    IF NEW.booking_count > 10 THEN
+        
+        INSERT INTO vehicle_status_change (vehicle_id, status_change)
+        VALUES (NEW.vehicle_id, TRUE)
+        ON DUPLICATE KEY UPDATE status_change = TRUE, last_update = NOW();
+    END IF;
+END */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+
+--
 -- Table structure for table `human`
 --
 
@@ -388,6 +436,7 @@ CREATE TABLE `vehicle` (
   `CURRENT_LOCATION` varchar(100) DEFAULT NULL,
   `STATUS` varchar(50) DEFAULT NULL,
   `LAST_UPDATE` datetime DEFAULT NULL,
+  `status_change` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`VEHICLE_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -398,8 +447,68 @@ CREATE TABLE `vehicle` (
 
 LOCK TABLES `vehicle` WRITE;
 /*!40000 ALTER TABLE `vehicle` DISABLE KEYS */;
-INSERT INTO `vehicle` VALUES (0,'','Booked','2025-04-18 14:24:22'),(1,'New York','Available','2025-04-18 14:37:44'),(2,'Dadri','Available','2025-04-18 14:37:22'),(3,'Shiv Nadar University','Available','2025-04-16 13:20:36'),(4,'Houston','Booked','2025-03-30 10:15:00'),(5,'New York','Booked','2025-04-16 12:19:42'),(6,'Philadelphia','Booked','2025-03-30 10:25:00'),(7,'San Antonio','Available','2025-03-30 10:30:00'),(8,'San Diego','Booked','2025-03-30 10:35:00'),(9,'','Booked','2025-04-18 14:19:53'),(10,'Jhanum','Available','2025-04-17 14:05:40'),(11,'Austin','Available','2025-03-30 10:50:00'),(12,'Jacksonville','Booked','2025-03-30 10:55:00'),(13,'Fort Worth','Available','2025-03-30 11:00:00'),(14,'Dadri','Available','2025-04-10 19:08:34'),(15,'San Francisco','Available','2025-03-30 11:10:00'),(16,'Charlotte','Booked','2025-03-30 11:15:00'),(17,'Indianapolis','Available','2025-03-30 11:20:00'),(18,'Seattle','Booked','2025-03-30 11:25:00'),(19,'Denver','Available','2025-03-30 11:30:00'),(20,'Dadri bc','Available','2025-04-10 14:07:50'),(21,'Boston','Available','2025-03-30 11:40:00'),(22,'El Paso','Booked','2025-03-30 11:45:00'),(23,'Nashville','Available','2025-03-30 11:50:00'),(24,'Detroit','Booked','2025-03-30 11:55:00'),(25,'Oklahoma City','Available','2025-03-30 12:00:00'),(26,'Portland','Booked','2025-03-30 12:05:00'),(27,'Las Vegas','Available','2025-03-30 12:10:00'),(28,'Memphis','Booked','2025-03-30 12:15:00'),(29,'Louisville','Available','2025-03-30 12:20:00'),(30,'Baltimore','Booked','2025-03-30 12:25:00'),(31,'Milwaukee','Available','2025-03-30 12:30:00'),(32,'Albuquerque','Booked','2025-03-30 12:35:00'),(33,'Tucson','Available','2025-03-30 12:40:00'),(34,'Fresno','Booked','2025-03-30 12:45:00'),(35,'Sacramento','Available','2025-03-30 12:50:00'),(36,'Mesa','Booked','2025-03-30 12:55:00'),(37,'Kansas City','Available','2025-03-30 13:00:00'),(38,'Atlanta','Booked','2025-03-30 13:05:00'),(39,'Long Beach','Available','2025-03-30 13:10:00'),(40,'Omaha','Booked','2025-03-30 13:15:00'),(41,'Raleigh','Available','2025-03-30 13:20:00'),(42,'Miami','Booked','2025-03-30 13:25:00'),(43,'Oakland','Available','2025-03-30 13:30:00'),(44,'Minneapolis','Booked','2025-03-30 13:35:00'),(45,'Tulsa','Available','2025-03-30 13:40:00'),(46,'Cleveland','Booked','2025-03-30 13:45:00'),(47,'Wichita','Available','2025-03-30 13:50:00'),(48,'New Orleans','Booked','2025-03-30 13:55:00'),(49,'Arlington','Available','2025-03-30 14:00:00'),(50,'Bakersfield','Booked','2025-03-30 14:05:00'),(51,'Sector 14, SNIOE','Available','2025-04-08 20:59:24'),(52,'Asia','Booked','2025-04-13 08:46:19'),(53,'D Block','Available','2025-04-16 13:58:28'),(54,'A Block','Booked','2025-04-16 14:04:23'),(55,'New York','Booked','2025-04-16 15:56:06');
+INSERT INTO `vehicle` VALUES (0,'','Booked','2025-04-18 19:18:15',0),(1,'New York','Available','2025-04-19 01:43:58',0),(2,'Dadri','Available','2025-04-18 19:33:04',0),(3,'Shiv Nadar University','Available','2025-04-16 13:20:36',0),(4,'Houston','Available','2025-03-30 10:15:00',0),(5,'New York','Available','2025-04-16 12:19:42',0),(6,'Philadelphia','Available','2025-03-30 10:25:00',0),(7,'San Antonio','Available','2025-03-30 10:30:00',0),(8,'San Diego','Available','2025-03-30 10:35:00',0),(9,'','Available','2025-04-18 14:19:53',0),(10,'Jhanum','Available','2025-04-17 14:05:40',0),(11,'Austin','Available','2025-03-30 10:50:00',0),(12,'Jacksonville','Available','2025-03-30 10:55:00',0),(13,'Fort Worth','Available','2025-03-30 11:00:00',0),(14,'Dadri','Available','2025-04-10 19:08:34',0),(15,'San Francisco','Available','2025-03-30 11:10:00',0),(16,'Charlotte','Available','2025-03-30 11:15:00',0),(17,'Indianapolis','Available','2025-03-30 11:20:00',0),(18,'Seattle','Available','2025-03-30 11:25:00',0),(19,'Denver','Available','2025-03-30 11:30:00',0),(20,'Dadri bc','Available','2025-04-10 14:07:50',0),(21,'Boston','Available','2025-03-30 11:40:00',0),(22,'El Paso','Available','2025-03-30 11:45:00',0),(23,'Nashville','Available','2025-03-30 11:50:00',0),(24,'Detroit','Available','2025-03-30 11:55:00',0),(25,'Oklahoma City','Available','2025-03-30 12:00:00',0),(26,'Portland','Available','2025-03-30 12:05:00',0),(27,'Las Vegas','Available','2025-03-30 12:10:00',0),(28,'Memphis','Available','2025-03-30 12:15:00',0),(29,'Louisville','Available','2025-03-30 12:20:00',0),(30,'Baltimore','Available','2025-03-30 12:25:00',0),(31,'Milwaukee','Available','2025-03-30 12:30:00',0),(32,'Albuquerque','Available','2025-03-30 12:35:00',0),(33,'Tucson','Available','2025-03-30 12:40:00',0),(34,'Fresno','Available','2025-03-30 12:45:00',0),(35,'Sacramento','Available','2025-03-30 12:50:00',0),(36,'Mesa','Available','2025-03-30 12:55:00',0),(37,'Kansas City','Available','2025-03-30 13:00:00',0),(38,'Atlanta','Available','2025-03-30 13:05:00',0),(39,'Long Beach','Available','2025-03-30 13:10:00',0),(40,'Omaha','Available','2025-03-30 13:15:00',0),(41,'Raleigh','Available','2025-03-30 13:20:00',0),(42,'Miami','Available','2025-03-30 13:25:00',0),(43,'Oakland','Available','2025-03-30 13:30:00',0),(44,'Minneapolis','Available','2025-03-30 13:35:00',0),(45,'Tulsa','Available','2025-03-30 13:40:00',0),(46,'Cleveland','Available','2025-03-30 13:45:00',0),(47,'Wichita','Available','2025-03-30 13:50:00',0),(48,'New Orleans','Available','2025-03-30 13:55:00',0),(49,'Arlington','Available','2025-03-30 14:00:00',0),(50,'Bakersfield','Available','2025-03-30 14:05:00',0),(51,'Sector 14, SNIOE','Available','2025-04-08 20:59:24',0),(52,'Asia','Available','2025-04-13 08:46:19',0),(53,'D Block','Available','2025-04-16 13:58:28',0),(54,'A Block','Available','2025-04-16 14:04:23',0),(55,'New York','Available','2025-04-16 15:56:06',0);
 /*!40000 ALTER TABLE `vehicle` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = cp850 */ ;
+/*!50003 SET character_set_results = cp850 */ ;
+/*!50003 SET collation_connection  = cp850_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER vehicle_booked_trigger
+AFTER UPDATE ON vehicle
+FOR EACH ROW
+BEGIN
+  
+  IF OLD.STATUS = 'Available' AND NEW.STATUS = 'Booked' THEN
+    
+    IF EXISTS (
+      SELECT 1 FROM bookings WHERE vehicle_id = NEW.VEHICLE_ID
+    ) THEN
+      
+      UPDATE bookings
+      SET booking_count = booking_count + 1
+      WHERE vehicle_id = NEW.VEHICLE_ID;
+    ELSE
+      
+      INSERT INTO bookings (vehicle_id, booking_count)
+      VALUES (NEW.VEHICLE_ID, 1);
+    END IF;
+  END IF;
+END */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+
+--
+-- Table structure for table `vehicle_status_change`
+--
+
+DROP TABLE IF EXISTS `vehicle_status_change`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `vehicle_status_change` (
+  `vehicle_id` int(11) NOT NULL,
+  `status_change` tinyint(1) DEFAULT '0',
+  `last_update` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`vehicle_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `vehicle_status_change`
+--
+
+LOCK TABLES `vehicle_status_change` WRITE;
+/*!40000 ALTER TABLE `vehicle_status_change` DISABLE KEYS */;
+INSERT INTO `vehicle_status_change` VALUES (1,0,'2025-04-19 01:43:58');
+/*!40000 ALTER TABLE `vehicle_status_change` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -411,4 +520,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-04-19  0:42:39
+-- Dump completed on 2025-04-19  3:40:02
