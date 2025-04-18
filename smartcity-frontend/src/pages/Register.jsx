@@ -27,7 +27,7 @@ function Register() {
     };
 
     try {
-      const res = await fetch('http://localhost:8080/users/', {
+      const res = await fetch('https://smart-city-transport-301261782088.us-central1.run.app/users/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)

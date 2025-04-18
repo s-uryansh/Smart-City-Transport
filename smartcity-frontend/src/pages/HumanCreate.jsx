@@ -49,7 +49,8 @@ function HumanCreate() {
     };
 
     try {
-      const res = await fetch('http://localhost:8080/humans/', {
+      // const res = await fetch('https://smart-city-transport-301261782088.us-central1.run.app/humans/', {
+      const res = await fetch('https://smart-city-transport-301261782088.us-central1.run.app/humans/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
