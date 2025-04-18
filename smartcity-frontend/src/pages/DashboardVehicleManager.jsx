@@ -2474,9 +2474,8 @@ return (
     setUpdateFormData({ ...updateFormData, status: e.target.value })
   }
 >
-  <option value="Active">Active</option>
-  <option value="Inactive">Inactive</option>
-  <option value="Maintenance">Maintenance</option>
+  <option value="Available">Available</option>
+  <option value="Booked">Booked</option>
 </select>
 
         </div>

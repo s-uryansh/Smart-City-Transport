@@ -3,7 +3,6 @@ package repository
 import (
 	"SmartCityTransportSystem/internal/models"
 	"SmartCityTransportSystem/pkg/db"
-	"log"
 	"time"
 )
 
@@ -31,12 +30,6 @@ func GetVehicleByID(id int) (models.Vehicle, error) {
 	var v models.Vehicle
 	err := db.DB.QueryRow("SELECT VEHICLE_ID, CURRENT_LOCATION, STATUS, LAST_UPDATE FROM vehicle WHERE VEHICLE_ID = ?", id).
 		Scan(&v.VehicleID, &v.CurrentLocation, &v.Status, &v.LastUpdate)
-	// if err != nil {
-	// 	log.Println("Vehicle nahi aya: ", err)
-	// 	return v, err
-	// } else {
-	// 	log.Println("Vehicle aya: ")
-	// }
 	return v, err
 }
 
@@ -51,11 +44,6 @@ func CreateVehicle(v models.Vehicle) error {
 func UpdateVehicle(id int, v models.Vehicle) error {
 	_, err := db.DB.Exec("UPDATE vehicle SET CURRENT_LOCATION = ?, STATUS = ?, LAST_UPDATE = ? WHERE VEHICLE_ID = ?",
 		v.CurrentLocation, v.Status, time.Now(), id)
-	if err == nil {
-		log.Println("Vehicle updated successfully")
-	} else {
-		log.Println("Vehicle update failed", err)
-	}
 	return err
 }
 

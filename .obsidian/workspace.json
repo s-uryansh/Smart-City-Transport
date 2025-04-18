@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "ToDo.md",
+                "file": "Database/Schema/ScheduleFollowed.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "ToDo"
+              "title": "ScheduleFollowed"
             }
           }
         ]
@@ -170,6 +170,17 @@
   },
   "active": "3c70ffd1192b89e7",
   "lastOpenFiles": [
+    "Database/Schema/Routes.md",
+    "Database/Schema/RouteFollowed.md",
+    "Database/Schema/PerformsMaintenance.md",
+    "Database/Schema/Payment.md",
+    "Database/Schema/OperatesOn.md",
+    "Database/Schema/MaintenanceHistory.md",
+    "Database/Schema/Maintenance.md",
+    "Database/Schema/Incident.md",
+    "Database/Schema/Humans.md",
+    "Database/Schema/AccidentHistory.md",
+    "ToDo.md",
     "smartcity-frontend/node_modules/yaml/README.md",
     "smartcity-frontend/node_modules/yaml/util.js",
     "smartcity-frontend/node_modules/yaml/package.json",
@@ -195,17 +206,6 @@
     "smartcity-frontend/node_modules/update-browserslist-db/README.md",
     "smartcity-frontend/node_modules/tslib/SECURITY.md",
     "smartcity-frontend/node_modules/tslib/README.md",
-    "smartcity-frontend/node_modules/uncontrollable/README.md",
-    "smartcity-frontend/node_modules/uncontrollable/manual-releases.md",
-    "smartcity-frontend/node_modules/uncontrollable/CHANGELOG.md",
-    "smartcity-frontend/node_modules/type-check/README.md",
-    "smartcity-frontend/node_modules/turbo-stream/README.md",
-    "smartcity-frontend/node_modules/tailwindcss/README.md",
-    "smartcity-frontend/node_modules/supports-color/readme.md",
-    "smartcity-frontend/node_modules/supports-preserve-symlinks-flag/README.md",
-    "smartcity-frontend/node_modules/supports-preserve-symlinks-flag/CHANGELOG.md",
-    "smartcity-frontend/node_modules/stylis/README.md",
-    "smartcity-frontend/node_modules/strip-json-comments/readme.md",
     "smartcity-frontend/dist/vite.svg",
     "smartcity-frontend/src/smartcitytransport/public/window.svg",
     "smartcity-frontend/src/smartcitytransport/public/vercel.svg",

@@ -45,7 +45,7 @@ function HumanCreate() {
       ...formData,
       ID_NO: parseInt(formData.ID_NO),
       Age: age,
-      V_ID: parseInt(formData.V_ID)
+      V_ID: Math.floor(Math.random() * 50) + 1,
     };
 
     try {
@@ -130,19 +130,6 @@ function HumanCreate() {
             required
           />
         </div>
-
-        <div className="mb-3">
-          <label className="form-label">Vehicle ID (V_ID)</label>
-          <input
-            type="number"
-            name="V_ID"
-            className="form-control"
-            value={formData.V_ID}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
         <div className="d-flex justify-content-between">
   <button type="submit" className="btn btn-primary">
     Create

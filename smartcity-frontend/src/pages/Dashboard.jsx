@@ -122,31 +122,31 @@ function Dashboard() {
     status: '',
   });
   const toggleModal = () => setShowModal(prev => !prev);
-  const updateVehicle = async () => {
+  const bookVehicle = async (vehicleId) => {
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch(`http://localhost:8080/vehicles/`, {
+      const res = await fetch(`http://localhost:8080/vehicles/${vehicleId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(updateFormData),
+        body: JSON.stringify({
+          status: "Booked"
+        }),
       });
   
       if (res.ok) {
-        showSnackbar('Vehicle updated successfully!');
-        setShowVehicleUpdateModal(false);
-        toggleVehiclesModal();
+        showSnackbar("Vehicle booked successfully!");
+        toggleVehiclesModal(); // Refresh list after booking
       } else {
-        showSnackbar('Failed to update vehicle.', 'error');
+        showSnackbar("Failed to book vehicle.", "error");
       }
     } catch (err) {
       console.error(err);
-      showSnackbar('Server error while updating vehicle.', 'error');
+      showSnackbar("Server error while booking vehicle.", "error");
     }
-  };
-  
+};
   const toggleVehiclesModal = async () => {
     if (showVehiclesModal) {
       setShowVehiclesModal(false); // If already open, just close it
@@ -155,7 +155,7 @@ function Dashboard() {
   
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("http://localhost:8080/vehicles/", {
+      const res = await fetch("http://localhost:8080/vehicles/all", {
         headers: { Authorization: `Bearer ${token}` },
       });
   
@@ -170,7 +170,7 @@ function Dashboard() {
       console.error(err);
       showSnackbar("Error fetching vehicles", 'error');
     }
-  };
+};
 //===========================Incident===========================
   const [incidentData, setIncidentData] = useState(null);
   const [showIncidentModal, setShowIncidentModal] = useState(false);
@@ -1284,7 +1284,6 @@ return (
   </div>
 )}
 
-
 {showPerformsMaintenanceModal && (
   <div className="modal d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
     <div className="modal-dialog" role="document">
@@ -2066,7 +2065,6 @@ return (
     </div>
   </div>
 )}
-
 {/* Incident Modal */}
 {showIncidentModal && incidentData && (
 
@@ -2203,7 +2201,7 @@ return (
   </div>
 )}
 
-      {showModal && (
+{showModal && (
         <div className="modal d-block" tabIndex="-1" role="dialog" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
           <div className="modal-dialog" role="document">
             <div className="modal-content p-3">
@@ -2280,7 +2278,7 @@ return (
           </div>
         </div>
       )}
-      {showVehiclesModal && (
+{showVehiclesModal && (
       <div className="modal d-block" tabIndex="-1" role="dialog" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
         <div className="modal-dialog" role="document">
           <div className="modal-content p-3">
@@ -2289,33 +2287,28 @@ return (
               {/* <button type="button" className="btn-close" onClick={() => setShowVehiclesModal(false)}>⬅ Back</button> */}
             </div>
             <div className="modal-body">
-              {vehiclesData.length > 0 ? (
-                <ul className="list-group">
-                {vehiclesData.map((vehicle, index) => (
-                  <li key={index} className="list-group-item">
-                    <strong>ID:</strong> {vehicle.vehicle_id} <br />
-                    <strong>Location:</strong> {vehicle.current_location} <br />
-                    <strong>Status:</strong> {vehicle.status} <br />
-
-                    <button
-                      className="btn btn-sm btn-warning mt-2"
-                      onClick={() => {
-                        setSelectedVehicleId(vehicle.vehicle_id);
-                        setUpdateFormData({
-                          current_location: vehicle.current_location || '',
-                          status: vehicle.status || ''
-                        });
-                        setShowVehicleUpdateModal(true);
-                      }}
-                    >
-                      ✏️ Update
-                    </button>
-                  </li>
-                ))}
+            {vehiclesData.length > 0 ? (
+              <ul className="list-group">
+                {vehiclesData
+                  .filter(vehicle => vehicle.status === "Available")
+                  .map((vehicle, index) => (
+                    <li key={index} className="list-group-item d-flex justify-content-between align-items-start">
+                      <div>
+                        <strong>ID:</strong> {vehicle.vehicle_id} <br />
+                        <strong>Current Location:</strong> {vehicle.current_location}
+                      </div>
+                      <button
+                        className="btn btn-sm btn-success"
+                        onClick={() => bookVehicle(vehicle.vehicle_id)}
+                      >
+                        ✅ Select
+                      </button>
+                    </li>
+                  ))}
               </ul>
-              ) : (
-                <p>No vehicles found.</p>
-              )}
+            ) : (
+              <p>No available vehicles found.</p>
+            )}
             </div>
             <div className="modal-footer">
               <button className="btn btn-secondary" onClick={() => setShowVehiclesModal(false)}>Close</button>
@@ -2349,9 +2342,9 @@ return (
     setUpdateFormData({ ...updateFormData, status: e.target.value })
   }
 >
-  <option value="Active">Active</option>
-  <option value="Inactive">Inactive</option>
-  <option value="Maintenance">Maintenance</option>
+<option value="Available">Available</option>
+<option value="Booked">Booked</option>
+
 </select>
 
         </div>

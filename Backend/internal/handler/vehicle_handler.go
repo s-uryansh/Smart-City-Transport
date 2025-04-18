@@ -69,6 +69,7 @@ func UpdateVehicle(c *gin.Context) {
 		return
 	}
 	id := h.VID
+	log.Println(id)
 
 	var v models.Vehicle
 	v.VehicleID = id
@@ -77,7 +78,7 @@ func UpdateVehicle(c *gin.Context) {
 		log.Println("Error(handler/vehicle): ", err)
 		return
 	}
-	log.Println("Vehicle Updating")
+	// log.Println("Vehicle Updating")
 	err = repository.UpdateVehicle(id, v)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not update vehicle"})
@@ -94,6 +95,12 @@ func UpdateVehicleByID(c *gin.Context) {
 		return
 	}
 	var v models.Vehicle
+	v, err = repository.GetVehicleByID(vid)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Vehicle not found"})
+		log.Println("Error(handler/vehicle): ", err)
+		return
+	}
 	v.VehicleID = vid
 	if err := c.ShouldBindJSON(&v); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
