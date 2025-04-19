@@ -1,7 +1,6 @@
 package db
 
 import (
-	"SmartCityTransportSystem/config"
 	"database/sql"
 	"fmt"
 	"log"
@@ -12,10 +11,15 @@ import (
 var DB *sql.DB
 
 func Connect() error {
-	cfg := config.AppConfig
+	// cfg := config.AppConfig
+	user := "root"
+	password := "6233"
+	host := "35.200.128.58"
+	port := "3306"
+	name := "smartcity"
 
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true",
-		cfg.DBUser, cfg.DBPassword, cfg.DBHost, cfg.DBPort, cfg.DBName)
+		user, password, host, port, name)
 
 	var err error
 	DB, err = sql.Open("mysql", dsn)
