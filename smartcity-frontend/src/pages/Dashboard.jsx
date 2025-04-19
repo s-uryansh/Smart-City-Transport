@@ -254,13 +254,9 @@ function Dashboard() {
       }
   
       const data = await response.json();
-      // //console.log('Incident created:', data);
-      // setShowIncidentModal(false);
-  
-      // Optionally update local list if your backend returns full incident
+
       setIncidentData((prev) => [...prev, data]);
   
-      // Clear the form and hide it
       setNewIncidentId('');
       setNewDescription('');
       setShowCreateForm(false);
@@ -1165,7 +1161,7 @@ return (
         </button>
     </div>
         <div style={{ position: "fixed", bottom: "20px", right: "20px", zIndex: 999 }}>
-          <Dropdown>
+          {/* <Dropdown>
             <Dropdown.Toggle variant="success" id="dropdown-basic">
               ⚙️
                 <i className="fas fa-cog"></i>
@@ -1178,7 +1174,7 @@ return (
               <Dropdown.Item onClick={fetchScheduleFollowed}>Schedule Followed</Dropdown.Item>
               <Dropdown.Item onClick={fetchRouteFollowed}>Route Followed</Dropdown.Item>
             </Dropdown.Menu>
-          </Dropdown>
+          </Dropdown> */}
         </div>
 </div>
 {showScheduleFollowedModal && (
@@ -1564,14 +1560,14 @@ return (
             aria-labelledby="dropdownMenuButton"
           >
             <li>
-              <button className="dropdown-item" onClick={fetchIncidentData}>
+              {/* <button className="dropdown-item" onClick={fetchIncidentData}>
                 Incident
-              </button>
+              </button> */}
             </li>
             <li>
-        <button className="dropdown-item" onClick={fetchMaintenanceData}>
+        {/* <button className="dropdown-item" onClick={fetchMaintenanceData}>
           Maintenance
-        </button>
+        </button> */}
       </li>
             <li>
         <button className="dropdown-item" onClick={fetchPayments}>
@@ -1579,9 +1575,9 @@ return (
         </button>
       </li>
             <li>
-            <button className="dropdown-item" onClick={fetchSchedule}>
+            {/* <button className="dropdown-item" onClick={fetchSchedule}>
   Schedule
-</button>
+</button> */}
 
       </li>
             <li>
@@ -2284,8 +2280,9 @@ return (
           <div className="modal-content p-3">
             <div className="modal-header d-flex justify-content-between align-items-center">
               <h5 className="modal-title mb-0">🚗 Vehicles</h5>
-              {/* <button type="button" className="btn-close" onClick={() => setShowVehiclesModal(false)}>⬅ Back</button> */}
+              <button type="button" className="btn-close" onClick={() => setShowVehiclesModal(false)}></button>
             </div>
+            
             <div className="modal-body">
             {vehiclesData.length > 0 ? (
               <ul className="list-group">

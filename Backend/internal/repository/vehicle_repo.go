@@ -40,6 +40,11 @@ func CreateVehicle(v models.Vehicle) error {
 		v.VehicleID, v.CurrentLocation, v.Status, time.Now())
 	return err
 }
+func InsertBooking(hid int, vid int) error {
+	_, err := db.DB.Exec("INSERT INTO booking_actions (human_id, vehicle_id) VALUES (?, ?);",
+		hid, vid)
+	return err
+}
 
 // UpdateVehicle updates an existing vehicle in the database
 func UpdateVehicle(id int, v models.Vehicle) error {

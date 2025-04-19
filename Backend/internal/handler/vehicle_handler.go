@@ -58,7 +58,6 @@ func CreateVehicle(c *gin.Context) {
 	}
 	c.JSON(http.StatusCreated, gin.H{"message": "Vehicle created"})
 }
-
 func UpdateVehicle(c *gin.Context) {
 	uid := c.GetInt("user_id")
 	var h models.Human
