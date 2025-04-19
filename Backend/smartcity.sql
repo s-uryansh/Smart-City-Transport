@@ -73,7 +73,7 @@ UNLOCK TABLES;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER update_vehicle_status_on_booking_count
+/*!50003 CREATE*/ /*!50017 DEFINER=`suryansh`@`localhost`*/ /*!50003 TRIGGER update_vehicle_status_on_booking_count
 AFTER UPDATE ON bookings
 FOR EACH ROW
 BEGIN
@@ -459,7 +459,7 @@ UNLOCK TABLES;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER vehicle_booked_trigger
+/*!50003 CREATE*/ /*!50017 DEFINER=`suryansh`@`localhost`*/ /*!50003 TRIGGER vehicle_booked_trigger
 AFTER UPDATE ON vehicle
 FOR EACH ROW
 BEGIN
