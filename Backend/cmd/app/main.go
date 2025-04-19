@@ -32,7 +32,6 @@ func main() {
 	if err != nil {
 		log.Fatal("Error loading config:", err)
 	}
-
 	go func() {
 		log.Println("Connecting to database in background...")
 		if err := db.Connect(); err != nil {
