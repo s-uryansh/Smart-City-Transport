@@ -41,7 +41,7 @@ Smart-City-Transport-System/
 
 - **Node.js** (for frontend development)
 - **Go** (for backend development)
-- **MongoDB** or another compatible database system
+- **MySQL** or another compatible database system
 
 ### Installation
 

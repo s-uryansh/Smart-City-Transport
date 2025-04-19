@@ -49,8 +49,8 @@ function HumanCreate() {
     };
 
     try {
-      // const res = await fetch('https://smartcity-backend-try1-301261782088.asia-south1.run.app/humans/', {
-      const res = await fetch('https://smartcity-backend-try1-301261782088.asia-south1.run.app/humans/', {
+      // const res = await fetch('http://localhost:8080/humans/', {
+      const res = await fetch('http://localhost:8080/humans/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)

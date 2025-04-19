@@ -3,7 +3,6 @@ package repository
 import (
 	"SmartCityTransportSystem/internal/models"
 	"SmartCityTransportSystem/pkg/db"
-	"log"
 )
 
 // Get all route_followed entries
@@ -70,6 +69,6 @@ func CreateRouteFollowed(rf models.RouteFollowed) error {
 // Delete a route_followed entry by vehicle ID and route ID
 func DeleteRouteFollowed(vehicleID, routeID int) error {
 	_, err := db.DB.Exec("DELETE FROM route_followed WHERE VEHICLE_ID = ? AND RT_ID = ?", vehicleID, routeID)
-	log.Println("Route Followed Deleted")
+	// log.Println("Route Followed Deleted")
 	return err
 }

@@ -19,7 +19,8 @@ func main() {
 	}
 	r := gin.New() // Gin router
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"https://smart-city-transport.vercel.app"},
+		// AllowOrigins:     []string{"https://smart-city-transport.vercel.app"},
+		AllowOrigins:     []string{"http://localhost:5173"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
